@@ -20,7 +20,7 @@ enableEmoji: true
 # Site parameters
 params:
 
-  # background: /images/background.jpg
+  background: /images/background.png
  
   # logo:
   #   main: /images/icons/truck.png
