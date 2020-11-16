@@ -1,0 +1,14 @@
+---
+title: Learning Update
+date: 2016-11-30 18:12:00
+description: Coding journey continues
+---
+
+I've not written many coding blog posts as I've hoped in the last two months. I've been coding for nearly 6 months and have learned more than I ever expected at this point. Over the last two months I have struggled to stay on a steady track of teaching myself to program. I don't mean that I haven't found the time, I actually spend somewhere between 15-20 (sometimes 30) hours a week on top of a full-time job learning to code. What I mean is staying focused on one language, or one coding book, or one online tutorial. I get so excited about all there is to learn and all the books I want to read that I find myself jumping between books, free courses, etc. From what I've heard, what I'm experiencing is rather common among new programmers so I suppose I'm not alone.
+
+I have strongly considered doing an immersive "bootcamp" but they can run upwards of $15k which isn't realistic for someone still paying of student loans. Recently, I discovered a program called Launch School which focuses on mastery of skills at a slower pace and so far the content seems to be in-depth.
+
+Hopefully my new path of learning will be more fruitful and I'll be able to set some time aside to write some blog posts.
+
+Until next time...
+<br>

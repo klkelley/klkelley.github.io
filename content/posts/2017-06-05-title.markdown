@@ -1,0 +1,14 @@
+---
+layout: post
+comments: true
+title: Enrolled @ Dev Bootcamp
+date: 2017-06-05 10:15:00
+description: Taking a leap of faith
+---
+For almost a year now I have been learning to program on my own. It takes plenty of self discipline and tenacity to stick with a tough project or learn a new concept especially when you don't understand something. Some weeks I felt confident because a particular concept began to "click", the next week it felt like nothing clicked! The most important part is just to **stick with it**, no matter how long it takes. I am proud of how far I've come and I've proved to myself that I definitely have tenacity.
+
+Coding bootcamps have always appealed to me partly because of the intense learning environments they foster. I wanted to attend a bootcamp when I first discovered programming but there's a definite financial factor for someone still paying off college debt. I promised myself I would give other learning paths a shot before considering a bootcamp. Plus, when it comes to spending (any amount of) money, I am always slow to make decisions. Once in college, it took me ~3 months to buy a $250 TV because I had to do research, weigh pros & cons, and decide if it was worth it. So you can imagine the thought process that has gone into my decision of whether to attend a bootcamp!
+
+After many, many months of learning on my own I now have a solid knowledge base but have had difficulty taking my skills to that next level. I have officially enrolled at Dev Bootcamp (Chicago) and will start in less than two weeks. I am excited to finally take all that I've learned and bring my skills to the next level. I know it will be a very tough 18 weeks but I'm ready for the challenge.
+
+I hope to be able to post throughout my time at DBC if time allows!

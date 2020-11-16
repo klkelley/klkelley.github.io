@@ -1,0 +1,165 @@
+---
+layout: post
+comments: true
+title: Package Principles 
+date: 2018-03-28 08:10:00
+description: Package Principles Applied 
+---
+
+
+This post will be focused on how my current HTTP server project either adheres or violates 
+certain package principles. I will discuss all the principles including their definitions
+and compare my current project's package structure. 
+
+> Package principles are a way of organizing classes in larger systems to make them more organized and manageable. They help to understand which classes should go into which packages (i.e. cohesion) and how these packages should relate with one another (i.e. coupling). 
+
+At the time of this writing, here is the structure of my current project:
+
+
+
+```bash 
+└── karakelley
+    └── http
+        ├── ContentGeneration
+        │   ├── ContentGenerator.java
+        │   └── HtmlGenerator.java
+        ├── FileSystem
+        │   ├── FileFinder.java
+        │   ├── FileFinderCache.java
+        │   ├── PublicDirectory.java
+        │   └── RealFileFinder.java
+        ├── HttpServer.java
+        ├── Main.java
+        ├── Request.java
+        ├── Response.java
+        ├── ServerConfiguration.java
+        ├── Status.java
+        ├── controllers
+        │   ├── Application.java
+        │   ├── Controller.java
+        │   ├── HelloWorldController.java
+        │   ├── InvalidRequestController.java
+        │   ├── RedirectController.java
+        │   ├── Router.java
+        │   └── StaticFilesController.java
+        └── utility
+            ├── BufferedLineReader.java
+            ├── CommandLineArguments.java
+            ├── Exit.java
+            ├── InMemoryAppender.java
+            ├── LineReader.java
+            └── SystemExit.java
+```
+
+
+
+
+The packages I have at the moment are `http`, `ContentGeneration`, `FileSystem`, `Controllers`, and 
+`Utility`. 
+
+
+#### **Granularity: The Principles of Package Cohesion**
+<br/> 
+These first three principles concern how to partition classes into packages. 
+
+**The Reuse-Release Equivalence Principle (REP):**
+
+REP means that the package must be created with reusable classes. In other words, Either all of the
+classes inside the package are reusable or none of them are. The classes must also be of the 
+same family which means that classes that are unrelated to the purpose of the package should not 
+be included. 
+
+
+I believe the contents of the `Utility` package violates this principle. I almost think it could adhere
+considering the purpose of classes within the package are helpers however they are unrelated to one 
+another. They would also change for different reasons (see the following principles). 
+
+On the other hand, I think all of the classes within the `Controllers`, `FileSystem`, and `ContentGeneration` packages are within the same family and serve the same purpose, thus adhering to the principle.  
+
+
+**The Common-Reuse Principle (CRP):**
+
+CRP states that classes that tend to be reused together belong in the same package together. It is a way
+of helping to decide which classes belong in which packages. If you reuse on of the classes in a package, 
+you reuse them all. Classes which are not tightly bound to each other should not belong in the same 
+package. 
+
+
+I think in some areas I am adhering to this specific principle. Specifically, the `Controller` package. 
+The entry point to this package is the `Application` class which relies on all the other classes. In order 
+to use `Application` you have to use the rest of the classes. This also applies to the `FileSystem` and
+`ContentGeneration` packages. 
+
+The violator in this case would be the `Utility` package. It's a package that I've stuck some random 
+helper classes; most of them are wrappers aside from `CommandLineArguments`. Based on this principle, 
+these classes do not belong together in the same package. 
+
+**The Common-Closure Principle (CCP):**
+
+CCP states that the package should not have more than one reason to change. If changes were to happen in 
+an application dependent on a number of packages, ideally you'd only want changes to occur in one package 
+rather than in a number of them. This helps to identify classes that are likely to change, and package 
+them together for the same reasons. In other words, if classes are tightly coupled, they belong in the 
+same package
+
+
+The glaring violator here, again, is the `Utility` package. These classes are not tightly bound to each 
+other and this package has many reasons to change. I do, however, think that the `Controllers`, `FileSystem
+`, and `ContentGeneration` are adhering to this principle in the sense that they would change
+for the same reasons. 
+
+
+#### **Stability: The Principles of Package Coupling**
+<br/> 
+These last three principles concern how to structure multiple packages. These three principles
+have been the most difficult for me to completely wrap my head around. 
+
+**The Acyclic-Dependencies Principle (ADP):**
+
+ADP states that "the dependency graph of packages or components should have no cycles". In other words, 
+there should be no circular dependencies between packages. When you have cyclic dependencies, a change to 
+any packages triggers an update in every package. When you have cyclic dependencies, you lose
+the barriers between packages which is the main benefit of packages. 
+
+
+After drawing a couple of diagrams, which was rather enlightening, I didn't identify any violations of this
+principle. With that said, this is something I will need to keep in mind as I refactor my package 
+structure.
+
+
+**The Stable-Dependencies Principle (SDP):** 
+
+The idea behind SDP is to depend in the direction of stability. Modules that are intended to be easy to 
+change should not be depended on by modules that are harder to change. Put simply, stable packages 
+shouldn't depend on unstable packages. 
+
+
+Admittedly, this was a hard one for me. I know that I have one or two packages depending on the `Utility` 
+package which needs to be refactored but its a very stable package. Trying to identify this principle made
+me realize that I struggle with identifying unstable modules. 
+
+
+**The Stable-Abstractions Principle (SAP):** 
+
+SAP states that a stable package should also be abstract, so that its stability does not prevent it from 
+being extended. It also states that an unstable package should be concrete, since its stability allows the 
+concrete code within to be easily changed. 
+
+I tend to struggle with things that sound subjective like "stability" because, well, its subjective. 
+With that said, I don't believe I am adhering to this particular principle in the sense that I do not
+have any abstract classes within my packages. This is something I hope to work towards once I get my 
+packages in adherence with the 3 cohesion package principles. 
+
+#### **Conclusion**
+<br/> 
+
+Its clear that I need to rethink and refactor the `Utility` package as it's violating more than one of the
+package principles. I've been in the habit of putting things that appear to be the same (like helper 
+classes) into the same package and it's something I need to be more cognizant of going forward. 
+
+I also realized that I need to put some of the classes that are within the `http` "parent" package
+into their own packages. 99% of the time I find more clarity in concepts after writing a blog post. 
+I will admit that I definitely understand the 3 cohesion principles significantly better compared to 
+when I read about them the first time in PPP. But, I still find the package coupling principles a little
+confusing. I hope with time and experience they will begin to make sense, in the way that the SOLID principles eventually clicked for me. 
+

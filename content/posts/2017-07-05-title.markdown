@@ -1,0 +1,50 @@
+---
+layout: post
+comments: true
+title: CSS Positioning
+date: 2017-07-05 11:30:00
+description: A little clarity on positioning elements in CSS
+---
+
+Week 2 at DBC was focused on HTML which was a great refresher for me. HTML was the first language I learned when I started learning how to code. I hadn't worked with it much in the last 7-8 months as I focused mostly on learning Ruby and basic programming concepts. I had the chance to dive deeper into building tables and gaining a better understanding of semantic elements.
+
+Week 3 is focused on CSS. My relationship with CSS has been a rocky one since I first started learning it along with HTML last year. I really enjoy tinkering with it and making webpages take on new personalities. I struggled with CSS mostly because I think I simplified it too much; I didn't understand the power CSS has in designing websites. I had ideas of how I wanted elements to look or appear on a webpage but I was mostly blindly typing in declarations or rules, hoping I would eventually create the correct combination to get my element styled like I wanted.
+
+Because of the holiday this week (4th of July), DBC is on break so students were given an extra week with the current material. I decided to take this chance and try to get a better understanding of positioning elements, selectors, and the three factors of the cascade when properties compete. I feel like each of those topics could be their own post so I'm going to focus mostly on positioning elements.
+
+**Types of Positions**
+
+There are five `position` property values available: `static`, `relative`, `absolute`, `fixed`, and `sticky`. Global values include: `inherit`, `initial`, and `unset` but I'm mostly going to talk about the first five.
+
+**Static**
+
+Static positioning is the default position of an element on the page, elements will stack on top of the next as expected.
+
+But, if you want to start moving elements around on the page using `top`, `right`, `bottom`, and `left` properties you're out of luck (same goes for `z-index`). It just so happens, those offset properties are unavailable to a static element.
+
+That last sentence alone was revolutionary to me. I can't count how many times I tried to move elements using those properties without changing the value of the position property.
+
+**Fixed**
+
+An element with the `position: fixed;` declaration is not going to move. Just as the name states, its fixed. The element is anchored relative to the viewport (screen/device window) and doesn't move even when scrolling.
+
+**Relative**
+
+Elements positioned relatively behave just like static elements but they can be positioned using the offset properties `top`, `right`, `bottom`, and `left`.
+
+**Absolute**
+
+An element with the `position: absolute;` rule is positioned relative to the nearest positioned ancestor. If the element has no positioned ancestors, it uses the document body. With an element positioned using `absolute` you remove the element out of normal flow and place it at a specific place on the page. Unlike `fixed` elements, it will scroll with the page.
+
+**Sticky**
+
+This is a rather new value for the `position` property. Sticking elements on a webpage has mostly been accomplished with Javascript however this can now be accomplished with this new value. `sticky` acts similar to `relative` until it hits a certain threshold (set using an `offset` property), which then causes the element to act like a `fixed` element. You could say `sticky` is a cross between `relative` and `fixed`. At this time however it seems browsers are implementing this value differently so it will act different depending on the browser your using.
+
+
+Note: when using `offset` properties is moved *from* its position not *to* the position.
+
+Take this declaration for example:
+`.example {position: absolute; top: 20px; }`
+It is moving `.example` 20 pixels away from the top instead of 20 pixels towards the top.
+
+As I work on a HTML/CSS project for Dev Bootcamp this new clarity has brought a new appreciation for CSS. I don't feel as though I'm blindly styling pages anymore and I am able to style pages more systematically but most importantly, with intention.

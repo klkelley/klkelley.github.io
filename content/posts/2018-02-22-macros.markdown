@@ -1,0 +1,121 @@
+---
+layout: post
+comments: true
+title: Clojure Macros  
+date: 2018-02-22 9:10:00
+description: What are they and how to write them in Clojure 
+---
+
+Macros have somewhat intimidated me as a newbie to Clojure. I didn't 
+understand why they would be useful and I had a hard time understanding how to write
+my own macros (still working on it, to be honest!). So let's talk about macro basics and how to write our own macros. 
+
+Macros in Clojure are a way to do metaprogramming. Metaprogramming is a programming technique in
+which computer programs have the ability to treat programs as their data. It means a program can modify 
+another program or even it's own program. This isn't a blog post about metaprogramming directly  but I 
+thought the relationship was important to note. 
+
+Macros are a way to extend Clojure to suit your specific problem. Macros enable you to do a few things: 
+1. Create and implement your own language features yourself
+2. Reduce the number of lines of code making it more readable and concise.
+3. Encapsulate patterns and repetive code by replacing it with a single macro call. 
+
+In fact, if you've been following along with my blog we just saw an example of a macro already
+built into clojure, threading macros. But we're going to look at making our own macros just know that
+there are some macros that come built-in to the language. 
+
+Defining a macro looks similar to how you would define a function. It takes an optional
+docstring, a vector of arguments, and has a body.  
+
+For some reason I tend to reach for `unless` when I work in Ruby. I don't have a strong reasoning behind
+it except that I just think it's easier to read. `unless` is an expression that is the opposite of `if`. Unfortunately, Clojure doesn't
+come with `unless` but good thing we're learning about macros! Let's make our own!
+
+
+
+```clojure
+(defmacro unless
+  [condition & forms]
+  `(if (not ~condition)
+    ~@forms))
+```
+
+
+
+We can call our new macros like so:
+
+
+
+```clojure
+(unless (= 1 2) true false)
+; true 
+
+```
+
+We will talk about what each of these lines means so don't fret. The first thing to note is that to
+create our own macro we use `defmacro` to define the macro. Next we have our vector of arguments which are similar to how you would
+construct a vector of arguments in a regular function. Where it gets wierd is the last two lines of the function. If you look closely
+you can see a backtick being used in front if the `if` condition. When writing macros in clojure those little backticks are referred to as syntax quoting. 
+
+
+Syntax quoting returns unevaluated data structures with fully qualified symbols (i.e. the symbol's namespace included). If you want to follow
+along feel free to open up your repl. Let's see some examples of syntax quoting. 
+
+
+
+```clojure
+(+ 4 9)
+; 13
+
+`(+ 4 9)
+; (clojure.core/+ 4 9)
+```
+
+
+So when you include use syntax quoting the expression is not evaluated and it is instead treated as a list. Kind of cool if you ask me! There is another type of quoting using `'` or `(quote)`. It's similar to syntax quoting but the difference is symbols are not
+resolved and you can't unquote them. Which is what we're going to talk about next but I did want to touch on the fact that there
+are two ways of quoting. 
+
+Ok so we know about the syntax quoting. What's up with the tilde `(~)`? When writing macros its referred to as unquoting. Unquoting is how you begin to evaluate expressions. Let's see an example of what I'm talking about. 
+
+
+
+```clojure
+`(+ 4 9)
+; (clojure.core/+ 4 9)
+
+`(+ 4 ~(inc 2))
+; (clojure.core/+ 4 3)
+```
+
+
+
+Once we hit the unquoting then the expression `(inc 2)` was evaluated. So in our `unless` macro we unquote (i.e. evaluate) the condition that's
+passed in which in our case is `(= 1 2)`. 
+
+
+
+Ok, now to the last funky line with the `~@forms`. This is referred to as unquote splicing. It's similar to unquote except 
+that it allows multiple forms to be inserted in place of a single unquote form. It essentially unwraps the data structure and 
+places the contents within the syntax-quoted data structure. Again, let's see an example. 
+
+
+
+```clojure
+`(+ ~(list 1 2 3))
+; (clojure.core/+ (1 2 3))
+
+`(+ ~@(list 1 2 3))
+; (clojure.core/+ 1 2 3)
+```
+
+
+So as you can see the unquote splicing unwraps the data structure and places it in the same order. We use unquote splicing
+in our `unless` macro because our macro takes a varying number of arguments which will be represented in a data structure therefore
+we must unwrap them otherwise we will get an error. 
+
+I believe understanding the anatomy of macros is important before you can begin to even write them. I underestimated the learning
+curve to understanding macros but I think this is a great step in the right direction.
+
+If you are new to Clojure I would highly recommend [Clojure for the Brave and True](https://www.braveclojure.com/clojure-for-the-brave-and-true/) which is explains some concepts rather well and with some humor at times. I'd also highly recommend Living 
+Clojure by Carin Meier. 

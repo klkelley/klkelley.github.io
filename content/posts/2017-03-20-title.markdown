@@ -1,0 +1,114 @@
+---
+title: Local Variable Scope
+date: 2017-03-21 14:05:00
+description: Understanding local variable scoping rules
+---
+There are many different types of variables in Ruby but for the purposes of this post I will only be addressing local variables and the concept of *scope* in regards to accessing local variables.
+<br>
+
+A variable's scope determines where in the program that variable is available for use. The scope is defined by where the variable is initialized.
+<br>
+
+Two common areas where we encounter variable scoping rules are in *blocks* and *methods*.
+<br>
+
+A block is a piece of code followed by a method invocation by using either `do...end` or `{ }`. As stated earlier, variable scope is determined by where it is initialized. Variables initialized in the outer scope can be accessed in the inner scope, but not vice versa.
+
+**Accessing Variables in Blocks**
+
+
+
+```ruby
+a = 1             # outer scope variable initialized
+
+loop do           # the block creates an inner scope
+  a = a + 1       # the value of a has been reassigned to 2
+  break           
+end
+
+puts a            # => 2
+```
+
+
+
+Because `a` was initialized before the block we were able to access it within the block, reassign it and have access to its new value outside the block.
+
+On the flip side, if we hadn't initialized `a` like the following example we would see an error like this:
+
+
+
+
+```ruby
+loop do
+  a = "dog"       # 'a' is initialized inside the block
+  puts a          # => 'dog'
+  break
+end
+
+puts a      
+# => NameError: undefined local variable or method `a' for main:Object
+```
+
+
+
+Because `a` was created in the inner scope of the block it is not accessible in the outer scope, thus we received an error. In order to have access to variables in the outer scope of a block, they need to be initialized first.
+<br>
+It should also be noted you cannot reference variables initialized in other blocks as shown below.
+
+
+
+```ruby
+loop do
+  a = 1         # 'a' initialized and assigned to 1
+  puts a        # => 1
+  break
+end
+
+loop do
+  puts a       # => NameError: undefined local variable or method `a' for main:Object
+  break
+end
+```
+
+
+
+
+**Local Variables & Methods**
+
+Methods (in regards to local variables) have no notion of "inner" and "outer" scope. In order for a method to have access to local variables they must be passed in to the method.
+
+Here is what happens when we try to access a variable without passing it into the method.
+
+
+
+```ruby
+num = 4
+
+def display_number
+  puts num
+end
+
+display_number    # => prac1.rb:4:in `display_number': undefined local variable or method `num' for main:Object (NameError)
+```
+
+
+
+On the other hand, if we properly pass in the variable to the method then it will be available to the method.
+
+
+
+```ruby
+num = 4
+
+def display_number(param)
+  puts param
+end
+
+display_number(num)       # => 4
+```
+
+
+
+Of course, all this only applies to local variables and however it is important to know how local variable scoping rules work when learning Ruby.
+
+<br>

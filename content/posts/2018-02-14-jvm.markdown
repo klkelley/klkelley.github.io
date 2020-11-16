@@ -1,0 +1,61 @@
+---
+layout: post
+comments: true
+title: Java Virtual Machine (JVM)
+date: 2018-02-14 13:01:00
+description: Getting to know the Java Virtual Machine and what it means to "run on the JVM"
+---
+
+
+As I began a new project using Clojure last week I found out that Clojure "runs on the JVM". There are other languages 
+that also run on the JVM including: Scala, Groovy, and Kotlin. So let's talk about what that JVM actually is and how
+other lanauges can run on it.
+
+At the heart of a computer is the CPU and it's job is to execute operations. The CPU's architecture 
+determines what operations are available as part of the architecture's *instruction set*.
+
+Languages like C are compiled into *instructions* that a CPU will understand. Broadly, the process is as follows: 
+1. The compiler reads the source code (the code you wrote in your editor)
+2. The compiler outputs corresponding object files 
+3. The linker *links* all the object files and produces an `.exe` file
+4. The CPU executes the `.exe` file (the *instructions*)
+
+
+If you're a visual person, like myself, this displays the process as well. 
+
+<br> 
+
+![c-compiling](http://users.ecs.soton.ac.uk/dem/teaching/maths/proginc/chapter1/complink.jpg)
+
+<br>
+
+In the end, you have to translate programs into instructions that the CPU can understand. It doesn't care what programming
+language you used as long as it has instructions. 
+
+So, the JVM is similar to a computer in that is also needs to translate code into instructions, called Java Bytecode. 
+It's important to note that it's a *virtual* machine so this is accomplished through software vs. hardware. 
+
+The main function of the JVM is to load and execute your application. A running JVM executes Java bytecode by translating it on the fly into machine code (CPU instructions), which is called just-in-time compilation.
+
+In order for programs to run on the JVM, it must be compiled into Java bytecode. When you compile programs, the bytecode is saved in a `.class` file. Then you package those files into Java archive files (JAR files). The JVM then executes the bytecode and sends machine instructions to the CPU. So similar to how the computer doesn't care how you generated machine instructions, the JVM doesn't care how you generated Java bytecode.  
+
+<br>
+
+![java-compiling](http://net-informations.com/java/intro/img/java-virtual-machine.png)
+
+<br> 
+
+What's cool is if you take a look at the above diagram is that depending upon the machine on which the Java bytecode has to be executed, the JVM interprets the `.class` and generates different machine language, making it understandable to that operating system for execution. So, Java can run on any machine as long as the JVM is installed. This means Java programs are machine **independent**!
+
+So when people say that Clojure (or Scala, Kotlin, etc) "runs on the JVM" or its a "hosted language" what that means is that Clojure programs gets compiled to Java bytecode and JVM processes execute them. I could have lead with that but I think having some context and an understanding of the JVM helps connect the dots easier. 
+
+
+This diagrams illustrates Clojure being compiled into Java bytcode for the JVM. 
+
+<br>
+
+![clojure-compiling](http://blog.ndk.io/img/AOT_compilation.svg)
+
+<br>
+
+So, we know that JAR files are essentially all of our `.class` files bundled together into one executable file. But, Clojure doesn't have classes so how are we able to run our Clojure apps bundled as JARs? You can actually make the Clojure compiler generate a class for a namespace by putting the `(:gen-class)` directive in the namespace declaration. Ironically, I actually came across this earlier today when I tried to run my JAR file and got an error. After a quick google search I fixed it but truly understanding why I needed to include that `(:gen-class)` directive makes all the difference. With that said, understanding how the JVM works has helped clarify my understanding of JAR files, too. It's a win win! 

@@ -1,0 +1,111 @@
+---
+layout: post
+comments: true
+title: SOLID&#58; Liskov Substitution Principle
+date: 2018-01-22 10:45:00
+description: Understanding LSP
+---
+
+The Liskov Substitution Principle, in summary, states:
+> Subtypes must be substitutable for their base types.
+
+It also states:
+>"If S is a declared subtype of T, objects of type S should behave as objects of Type T are expected to behave, if they are treated as objects of type T"
+
+
+If that second statement confused you, don't fret. I'll admit that the Liskov Substitution Principle has been one of the more difficult principles for me to completely understand. I'm going to use an example that strays away from the classic geometry example using rectangles and squares to illustrate LSP.
+
+Say we have a `Automobile` class with the functions of `openDoor()` and `closeDoor()`. We also different types of automobiles that inherit from this class. The implementation details of opening and closing of a door do not matter at all. The idea right now is that all automobiles have doors that can be opened and closed.
+
+
+
+```java
+public class Automobile {
+
+  public void startEngine() {
+    // ..
+  }
+
+  public void openDoor() {
+    // ..
+  }
+
+  public void closeDoor() {
+    // ..
+  }
+
+  //..
+
+}
+
+public class Sedan extends Automobile {
+  // ...
+}
+
+
+public class Motorcycle extends Automobile {
+
+  public void openDoor() {
+   // this method does nothing; motorcycles do not have doors!
+  }
+}
+
+
+```
+
+
+
+Everything was working great until we added the new `Motorcycle` class. Not to state the obvious but motorcycles do not have doors. If we wanted to keep the current design we could add an `if/else` condition and treat instances of `Motorcycle` differently. If you've been following along with my SOLID principles series thus far you'd agree that solving the problem this way is a clear violation of OCP. With that said, a violation of the Liskov Substitution Principle is likely a violation of the Open-Closed Principle as well.
+
+With our current design, instances of `Motorcycle` cannot be substitutable for it's base type, `Automobile`. LSP suggests that subclasses should be substitutable for their parent class. In other words, an instance of a subclass (in our case, motorcycle) should be able to be used by code that expects to work with instances of it's parent class (i.e. automobile). To apply Liskov means that a subclass must not change the expected behavior of its parent class. So overriding the behavior just for a motorcycle isn't going to be an option either.
+
+With all of that said, it's pretty clear we are violating LSP. So, what's the alternative? Sure, A motorcycle is-a type of automobile but for the purposes of our sample application I don't believe we have the correct abstraction in order to adhere to LSP. Let's make some changes.
+
+
+
+
+```java
+
+public class Vehicle {
+
+  public void startEngine() {
+    //..
+  }
+
+  //..
+}
+
+
+public class FourWheelAutomobile extends Vehicle {
+
+  public void closeDoor() {
+    //..
+  }
+
+  public void openDoor() {
+    //..
+  }
+}
+
+public class TwoWheelAutomobile extends Vehicle {
+  //..
+}
+
+
+public class Motorcycle extends TwoWheelAutomobile {
+  //..
+}
+
+public class Sedan extends FourWheelAutomobile {
+  //..
+}
+
+
+```
+
+
+
+
+If you state that something is true about the parent type then it has to be true for each of it's child classes in order to conform to LSP. Said another way, if you state that the parent can perform a particular behavior then all child classes should also be able to perform that same behavior. In our first example, we violated this rule by having motorcycle inherit from Automobile as behavior of automobile included opening and closing of doors. This was a behavior that instance of `motorcycle` could not perform.
+
+There are many benefits to adhering to LSP. If we can ensure that our subclasses can be substituted for instances of its parent class then we can be confident that we won't need to change client code when new subclasses need to be added. Adhering to LSP also allows us to adhere to the other SOLID principles as we already discovered that we can violate LSP while violating OCP at the same time. 

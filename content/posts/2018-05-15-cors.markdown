@@ -1,0 +1,73 @@
+---
+layout: post
+comments: true
+title: CORS  
+date: 2018-05-15 14:52:00 
+description: What is CORS? 
+---
+
+This week I came across my first CORS error. I was trying to make an HTTP 
+request from my React app to my TicTacToe API; both apps are deployed on 
+different domains. 
+
+Previously, I had made countless requests to my API using Postman, Netcat, 
+Telnet, etc. so why all of a sudden am I getting these weird CORS errors? 
+
+First, it's important to know about same-origin policy which is a security 
+measure implemented by web browsers. It's goal is to prevent JavaScript code 
+from making requests against a different origin (i.e. a different domain) 
+than the one from which its served. Why? Consider that you logged into your 
+favorite social media site, lets say Twitter, and in a new tab you visit a
+malicious website. Without same-origin policy, the JavaScript on the 
+malicious website could essentially pretend to be you. It could post new 
+Tweets, access your account settings, etc. With same-origin policy, the 
+browser can detect if the JavaScript is trusted to access 
+Twitter's resources. It detects this by checking if the JavaScript is included 
+from an HTML page on twitter.com. 
+
+It should be noted as well that this policy only applies to executing 
+JavaScript. Browsers don't enforce the same security measures when loading resources 
+such as images, stylesheets, videos, etc. 
+
+So, what if you have an application at the domain `http://www.somesite.com/` that
+needs to make legitimate requests to `http://www.othersite.com/`? Same-origin 
+policy's strictness would forbid this. Which finally brings us to CORS. 
+
+
+CORS is an acronym for Cross-Origin Resource Sharing; it serves to relax the 
+same-origin policy, allowing JavaScript on a web page to consume an API served 
+from a different origin. Any request for a resource outside of the origin is 
+known as a cross-origin request and CORS manages these cross-origin requests. 
+
+Servers must implement ways to handle these requests from outside origins. In
+other words, servers needs to specify who (which origins) can access assets
+on the server. In order to inform the browser who is allowed to access these assets
+the server must respond with an `Access-Control-Allow-Origin` header that matches
+the origin of the request. For example: 
+
+
+
+```
+Access-Control-Allow-Origin: http://www.othersite.com/
+```  
+
+
+You can also set this particular header to `*` which means that the resource
+can be accessed by any domain; it's definitely the least restrictive. 
+
+
+Another aspect I'd like to touch on briefly are CORS preflight requests. These
+requests are CORS requests that send an `OPTIONS` request to make sure the actual
+request is safe to send. Preflight requests will be sent if the request method is: 
+`PUT`, `DELETE`, `CONNECT`, `OPTIONS`, `TRACE`, or `PATCH`. In addition, regardless
+of the http method, if the `content-type` of the request
+is anything other than `text/plain`, `multipart/form-data`, 
+or `application/x-www-form-urlencoded` a preflight request will be sent as well. 
+In my case, I am sending JSON therefore preflight requests are always sent. 
+
+
+In summary, same-origin policy and cross-origin resource sharing are enforced
+by the browser itself. If you're making API calls via Postman you won't come across
+any CORS issues so that is something to keep in mind. Also be sure your server
+knows how to handle `OPTIONS` requests for those preflight requests from CORS. 
+

@@ -1,0 +1,85 @@
+---
+layout: post
+comments: true
+title: DRY principle
+date: 2018-01-05 19:15:00
+description: Breaking down the DRY principle
+---
+
+Over the past year I've come across the concept of DRY (Do not Repeat Yourself)
+time and time again. It was one of the first software principles that made sense to me
+and happened to be one of the first principles I would usually attempt to apply
+in my code.
+
+The DRY principle states "Every piece of knowledge should have one and only one
+representation." It is also expressed as "Once and Only Once." That last expression
+is what I took very literally and overlooked the concept of *knowledge*.
+
+I judiciously applied this principle by looking for code that looked the same which would
+imply **duplication**. This week I began reading [Understanding the Four Rules of Simple Design](http://www.r-5.org/files/books/computers/languages/ruby/main/Corey_Haines-The_Four_Rules_of_Simple_Design-EN.pdf)
+by Corey Haines. It wasn't soon after I started reading that realized I had
+been applying this principle incorrectly.
+
+Instead of focusing on textual duplication the correct way to apply this principle
+involves looking for *knowledge duplication*. Apparently, I'm not the first nor the last person to have this
+misconception about applying the DRY principle that seems to often stem from fixation on the
+"Once and Only Once" expression.
+
+Let's look at this example which happens to be a snippet from the bowling game kata I've been working
+on each day this week.
+
+
+
+```
+public class BowlingGame {
+  //...
+
+  private boolean isSpare(int frameIndex) {
+       return rolls[frameIndex] + rolls[frameIndex+1] == 10;
+   }
+
+   private boolean isStrike(int frameIndex) {
+       return rolls[frameIndex] == 10;
+   }
+ }
+```
+
+
+
+At first glance, you can notice textual duplication. Right off the bat I notice
+`rolls[frameIndex]` and comparison to `10`. I have the temptation to extract it even further
+because it seems like duplication. One technique I picked up from reading Understanding the
+Four Simple Rules of Design is to look past the textual duplication and instead
+**explicitly name the concepts prior to eliminating the perceived duplication**.
+
+Let's give that a try using the same code example.
+
+
+
+```
+public class BowlingGame {
+  //...
+
+  private boolean isSpare(int frameIndex) {
+       // is the current frame considered a spare?
+   }
+
+   private boolean isStrike(int frameIndex) {
+       // is the current frame considered a strike?
+   }
+ }
+```
+
+
+
+While this example may seem a bit contrived, it shows that the comparison
+to `10` and reference to `rolls[frameIndex]` in each of these functions
+both represent different _pieces of knowledge_. The first function is checking to see
+if the frame is considered a spare. The second function is checking to see if the
+frame is considered a strike. Both are different pieces of knowledge.
+I will have to take some time to unlearn, if you will,
+the way I've applied DRY up until now but this is also a reminder to myself not to
+overlook concepts that I believe I have an understanding of.
+
+With this in mind, I also hope to dedicate a few blog posts to other design principles, i.e. SOLID,
+in the future so I can properly flesh out my understanding of their application as well.

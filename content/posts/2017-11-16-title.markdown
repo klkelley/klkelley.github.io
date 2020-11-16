@@ -1,0 +1,23 @@
+---
+layout: post
+comments: true
+title: Post DBC
+date: 2017-11-16 08:22:00
+description: Summary of DBC and what's next
+---
+
+Almost three weeks ago I graduated from Dev Bootcamp. I had intended to
+blog about my journey throughout but time didn't allow. It was an incredible learning
+experience and I learned more than I could have imagined.
+
+Prior to DBC I had been learning Ruby on my own for nearly a year. Being able to finally
+put the pieces of the puzzle together brought so much clarity what I learned on my own.
+By the end of Dev Bootcamp, I developed multiple full-stack applications in Rails and Sinatra independently and within teams using agile methodologies and TDD.
+
+I think one of the most important things I learned was how to learn quickly. It wasn't unusual for me to quickly rack up 75-90 hours each week learning new technologies or building a new program. Towards the end of DBC, picking up a new framework or language wasn't scary - it was exhilarating! As part of the capstone project, students pitch app ideas and the ideas with the most votes are chosen. The project I ended up working on was an iOS native app written in Swift. I was apart of a team of four and aside from me taking a quick Swift tutorial once, none of us had programmed in Swift before. I should also mention the app has to be built in less than 8 days.
+
+The learning curve was steep considering the app needed to be developed in XCode, we were learning a new language but also our first statically typed language, and Swift is a very young language that continues to evolve. In the end, we successfully developed the app within the timeframe and I proved to myself I can learn just about anything with the right mindset.
+
+Now, I plan to focus my time on building out some side projects in Rails and getting more comfortable with some JavaScript frameworks as a search for my first developer job. I'm also looking to contribute to my first OSS project.
+
+Reach out if you are looking for a hard working junior developer or just want to chat about code.

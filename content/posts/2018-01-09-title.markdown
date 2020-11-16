@@ -1,0 +1,82 @@
+---
+layout: post
+comments: true
+title: Presenter Pattern
+date: 2018-01-09 12:15:00
+description: Applying the presenter pattern and an SRP preview 
+---
+
+The presenter pattern can be loosely tied to the idea of the Single Responsibility
+Principle (SRP). SRP states that "a class or module should have only one reason to change". 
+If your class or module does two (or more) unrelated things then it does not have a single responsibility;
+it has more than one reason to change. 
+
+This week as I worked on my Tic Tac Toe board, I had the inclination to have my
+`UserInterface` class also handle the building the TTT board. 
+I felt that it didn't really belong in the `UserInterface` because that would mean
+the `UserInterace` was responsible for displaying information to the user along
+with assembling the board. Those were two unrelated responsibilities meaning
+`UserInterface` would have two reasons to change. 
+
+I decided to put the knowledge of assembling the board into a `BoardInterface`. 
+I knew that it didn't belong in the UI class but I wasn't quite sure where to put it. Making
+a `BoardInterface` class made the most sense to me, at the time. One of my mentors, however,
+suggested looking into the Presenter Pattern. 
+
+The presenter pattern is apart of the MVP (Model View Presenter) architecture
+pattern and often associated with Android/iOS/GUI apps. However the concept
+can still be applied in the case of a console application.
+
+So, to get to the point, the concept of a presenter is to exist as an implementation 
+detail of the UI. Without me explicitly knowing it, this is what I wanted.  
+
+It was clear that my `BoardInterface` was named poorly and happened to be
+more aligned with the presenter pattern. The first step was to rename it `BoardPresenter`. 
+I am always amazed at how proper naming can make a difference. Immediately, it felt
+like the functions inside my class better aligned with the class name (and purpose). 
+This reminds me of one of the things Corey Haines mentioned in Understanding the Four
+Simple Rules of Design: "One of the key parts of being easier to change (i.e. a
+better design) is being able to more easily find where the changes
+need to occur; this is what good naming contributes to."
+
+So now that I've renamed `BoardInterface` to `BoardPresenter` let's take a look
+at it's functionality. 
+
+
+
+```
+public class BoardPresenter {
+  
+  //...
+
+  public String setupBoard() {
+    return String.format(board, makeSpaces().toArray());
+  }
+
+  private ArrayList<String> makeSpaces() {
+    ArrayList<String> spaces = new ArrayList<>();
+
+    for (int i = 0; i < 10; i++) {
+      spaces.add(Integer.toString(i));
+    }
+
+    return spaces;
+  }
+
+}
+```
+
+The `BoardPresenter` is only concerned with setting up the board to be passed
+along to the UI to be displayed to the user. If the way the board is displayed needs
+to change, which I have a very good feeling that it will, I only need to make
+changes in this class. The `UserInterace` class should remain untouched in this event.
+
+You may argue this functionality belonged in a `Board` class. While
+I do not have a `Board` class at this time, I know at the very least that a `Board` 
+class would likely be responsible for keep track of the state of the board. Having
+it assemble the board and the board state is a violation of SRP. 
+
+To sum it all up, the presenter pattern is loosely tied to the concept of SRP but its applicable
+when dealing with a UI (of any kind). To implement the presenter pattern you need to 
+extract the implementation details of how to display an entity and simply pass
+that along to the UI. 

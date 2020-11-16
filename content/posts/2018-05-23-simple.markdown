@@ -1,0 +1,135 @@
+---
+layout: post
+comments: true
+title: Simple Made Easy 
+date: 2018-05-23 11:20:00
+description: Striving for simplicity   
+--- 
+
+I watched Rich Hickey's talk on [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy) 
+and he discusses why simplicity matters in software and what it 
+means to create simple systems. I thought this talk was rather interesting in 
+the way he dives deep into the meaning of simplicity and easiness in regards to software. 
+
+I tend to think of "simple" as being synonymous with easy. 
+What's easy for me is not necessarily easy for others and vice 
+versa. For this reason, I strive not to use either of these 
+words. 
+
+However, Rich talks about the origins of the word "simple". The 
+roots of "simple" are "sim" and "plex" meaning "one twist". The 
+opposite of this word would be complex which is "multiple 
+twists" or "braided". 
+
+He goes on to say that simple things are focused and they
+do not address multiple issues. Simple things have one role, 
+they fulfill one task, and they have one objective. My 
+first thought was this sounds like the Single 
+Responsibility Principle! I believe the theme of SRP
+shines through strongly throughout his talk but he goes
+beyond SRP by talking about constructs. More on that later. 
+
+Easiness, on the other hand, implies "nearness"; something
+that can be obtained easily or near to our understanding. 
+When someone explains a concept and says "Well, its easy!". 
+What they are implying is that the concept is near to **their** 
+understanding and they're familiar with it. 
+
+
+While it may seem straightforward and implied - simplicity in 
+software matters. Choosing easiness is a common path. Easiness
+allows you to move faster in the beginning but Rich argues that 
+this will cause accumulated complexity over time which kills 
+projects. Remember, that easy is near to our understanding. Easy 
+things can definitely be complex (like state and syntax); its 
+incidental complexity. 
+
+
+If on the other hand, we choose simplicity from the beginning we 
+may move slower but this pays off as time goes on. 
+
+
+So what's complex? It's something that interleaves and braids 
+together. It's the opposite of simple. Rich Hickey suggests some 
+core entities that are considered complex (because they are
+intertwined) in software: 
+
+* State - everything it touches
+* Objects - state, identity, value
+* Syntax - meaning and order
+* Inheritance - types
+* Variables - value, time
+* Imperative loops - what/who
+* Actors - what/who 
+* ORM - self explanatory
+
+Interesting!! If you start to think about the definitions of 
+simple and complex, these listed items are actually complex and 
+also very likely easy! Take state for example - that's easy! But 
+its considered complex because in one way or another it ends up 
+touching other things. 
+
+But, now you're probably thinking "If these are complex, what's 
+left? What's simple?!" At least that was my first reaction. It 
+does seem, however, that several items on the following list seem
+more specific to some FP languages but I don't think Rich Hickey
+is suggesting simplicity is only achievable with FP but its 
+apparent that FP is favored. 
+
+* Values - use final, persistent collections 
+* Functions - use stateless methods
+* Namespaces 
+* Data - Use maps, arrays, sets, XML, JSON
+* Polymorphism ala carte - through Clojure protocols and Haskell type classes 
+* Managed refs - available in Clojure and Haskell 
+* Set functions 
+* Queues
+* Declarative data manipulation - SQL, LINQ, Datalog 
+
+
+The main idea is that if you use more simpler tools, you can 
+focus on the system and in turn write better systems. In a way, 
+Rich Hickey is taking SRP to a complete different level. Instead
+of taking things at face value in your preferred language, reach
+for constructs that are simple. It's important to note that 
+simplicity does not correlate with "less". Rich Hickey argues
+that simplicity will often mean creating more things which
+isn't a bad thing. 
+
+Choosing simpler constructs is the first step. The second step
+to simpler systems is to use abstraction. He suggests asking what, 
+who, when, where, why and how for abstraction. 
+
+* What - What do we want to accomplish? Use constructs available 
+(i.e. interfaces in Java). Give them names and ensure they're 
+small (no large interfaces!). At this point, avoid thinking 
+about the how. 
+
+* Who - Define the data or entities the abstraction will use. 
+Avoid getting into the details of any subcomponents and don't 
+complicate an entity with the details of another entity. In 
+other words, create boundaries! See what I did there? 
+
+* How - This is about the implementation details. Rich suggests 
+using polymorphism and isolating implementation details as much 
+as possible. 
+
+* Why - This about the policy and rules of the application. 
+
+
+I think this is an interesting way to build and design systems. 
+I'm often guilty of taking things at face value. I'm definitely 
+guilty of reaching for what's easy - I think many people could 
+probably agree with that however. It seems many (not all) of 
+these principles would be more appropriate for a functional 
+language considering that Rich Hickey suggests that Objects in 
+themselves are complex so that put an OO language in a tough 
+spot. 
+
+This definitely makes me think of things and decisions I've made 
+in different ways. I've only thought about simplicity and 
+complexity in terms of large entities like the way I've composed 
+objects for instance and I haven't thought about it at a more 
+granular level. I think this will take some practice and getting 
+out of "auto-pilot", for a lack of better words, but it seems 
+rather essential to building simpler systems. 

@@ -1,0 +1,104 @@
+---
+layout: post
+comments: true
+title: Java Interfaces
+date: 2018-01-11 15:40:00
+description: Understanding interfaces in Java 
+---
+
+
+To understand interfaces and how to use them in Java I'm going to work off an example
+that includes a `ComputerPlayer` class and a `HumanPlayer` class within a TTT game. They both implement
+some of the same functions. During game play, I don't necessarily want to know if I'm dealing
+with a HumanPlayer or a ComputerPlayer. I do know that I want them to both call `makeMove()` when it's
+their turn. The problem is, `makeMove()`, requires different implementation depending on the 
+tye of player. A human player will be able to select a spot on the board which will involve getting 
+input from the actual user. A computer player, on the other hand, will select
+their spot based on some algorithm. So essentially, we are looking for the same behavior but different 
+implementations of that behavior. 
+
+This is where interfaces come into play. An interface is a reference type in Java while it is similar to a class
+it is just a collection of abstract methods. A class implements an interface, thus it inherits the abstract methods of that interface. Interfaces help acheive abstraction and loose coupling.
+
+Take a look at this example of an interface implementation using our `HumanPlayer` and `ComputerPlayer` examples. 
+
+
+
+```
+public interface Player {
+	String makeMove();
+}
+
+// here we state the type to be returned from the function and the function name
+
+
+
+public class HumanPlayer implements Player {
+	//...
+
+	public String makeMove() {
+		// implementation details 
+	}
+}
+
+public class ComputerPlayer implements Player {
+	//...
+
+	public String makeMove() {
+		// implementation details
+	}
+}
+```
+
+
+_Side note: After looking at this example you can see the "IS-A relationship". A `HumanPlayer` IS-A player and a `ComputerPlayer` IS-A player._
+
+I want to circle back around to the idea of interfaces as types. If you define a variable whose type is an interface, then you must assign it an instance of a class that implements that interface. Let's use our example to illustrate this: 
+
+
+
+```
+Player player1 = new HumanPlayer(); 
+
+// Interface varName = new classThatImplementsTheInterface()
+
+```
+
+
+
+I'll admit that when I was trying to implement an interface for the first time I spent a good 20 minutes trying 
+to instantiate my interface not truly understanding how interfaces worked. 
+
+It should also be noted that you cannot pick and chose which functions you would like to implement in a class
+that claims to implement an interface. If a class implements an interface then all methods defined in the interface *must* be included in the class. 
+
+That brings us to the concept of `default methods`. Say we wanted to add another
+behavior in our `Player` interface. Doing so would cause our `HumanPlayer` and `ComputerPlayer` classes to break 
+because they would not have all of the methods defined in the interface. To get around this, Java 8+ has now 
+implemented `default methods`. It allows the interface to define the implementation details in the case where
+a class fails to provide implementation for that particular method. This enables us to modify an interface without breaking the classes that implement it's behavior. 
+
+Say we wanted add functionality to allow our players to be able to quit the game, just for example. 
+
+
+
+
+```
+public interface Player {
+	boolean makeMove();
+
+	default void quitGame() {
+		// implementation details
+	}
+}
+
+```
+
+
+
+
+For a small application or side project, you could easily manually implement the new functions in classes
+that implement the interface. But where `default methods` really come into play and become important is if some of the classes are located in client code of an API because it will break their code as well. 
+
+I had read about interfaces in books before but coming from Ruby, interfaces don't really exist, at least not formally like in Java. With that said, I am excited to work with interfaces in my TTT project. 
+

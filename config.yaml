@@ -30,6 +30,7 @@ params:
   gitRepo: https://github.com/klkelley/klkelley.github.io
 
   # specify whether you want to write some blog posts or not
+  enableBlogPost: true
 
   # specify whether you want to show Table of Contents in reading page
   enableTOC: true

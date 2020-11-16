@@ -1,0 +1,124 @@
+---
+layout: post
+comments: true
+title: SOLID&#58; Dependency Inversion Principle
+date: 2018-02-07 11:00:00
+description: Dipping into DIP 
+---
+
+The Dependency Inversion Principle states: 
+> "High level modules should not depend on low level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions."
+
+Put simply, the Dependency Inversion Principle says that you should
+depend on abstractions and not concretions.
+
+Let's take a look at this example which violates the Dependency Inversion
+Principle. What if we wanted to build an application that sent notifications to users via email. 
+This is one way to do it: 
+
+
+```java 
+public class Email {
+  private String emailAddress;
+  private String subject;
+  private String content;
+
+  public void sendEmail() {
+    // .. 
+  }
+}
+
+public class Notification {
+  private Email email;
+
+  public Notification(Email email) {
+    this.email = email; 
+  }
+
+  public void Send() {
+    email.sendEmail();
+  }
+}
+
+```
+
+
+
+Cool, this doesn't look so bad. But wait, on second thought, this means we can't send notifications any other way. It's 2018 after all and we'd like to 
+be able to send notifications via SMS. Right now, we can't do that. `Notification` currently only supports `Email`. The system is coupled and rigid. It's nearly impossible to send a notification any other way. Our high level module `Notification` is dependent on a low level module, `Email`. 
+
+Let's try our hand at refactoring this using the Dependency Inversion Principle. In Java, we can create an abstraction using interfaces. 
+
+
+
+
+```java 
+public interface Notifiable {
+  public void sendNotification;
+}
+
+
+public class Email implements Notifiable {
+  private String emailAddress;
+  private String subject;
+  private String content;
+
+  public void send() {
+    // .. 
+  }
+}
+
+public class Notification  {
+  private Notifiable notification;
+
+  public Notification(Notifiable notification) {
+    this.notification = notification; 
+  }
+
+  public void send() {
+    notification.send();
+  }
+}
+```
+
+
+
+Now _when_ we need to add SMS capability we can simply add a new class that implements the `Notifiable` interface like so. 
+
+
+
+```java 
+public class SMS implements Notifiable {
+  private String phoneNumber;
+  private String message;
+
+  public void send() {
+    // .. 
+  }
+}
+```
+
+
+
+The idea here is to rely on an abstraction instead of a concretion. I know I said that already but it's really the point here. 
+The same idea applies if we were building a Tic Tac Toe game and our `Game` took two `HumanPlayers`. Our game just needs players, it shouldn't care what kind, it should work with any type of player. But if we hard code our `Game` to be coupled to `HumanPlayers` we can't support new player types like `ComputerPlayer`. Instead, we could implement a `Player` interface and have all different types of players implement the `Player` interface. This would allow the game to support any type of player. 
+
+While this is not a hard fast rule, if you find yourself using the `new` inside a class or small changes in your application create a ripple effect, it's likely you are violating the Dependency Inversion Principle. 
+
+Adhering to the Dependency Inversion Principle will allow your classes to become more "pluggable" (see below for a literal example) which in turn allows them to be changed independently without affecting other classes. You will end up with more code, classes, and interfaces but it enhances the flexibility of your code. This is something I have to keep in mind; More code or more classes isn't necessarily a bad thing. In hindsight, I wish this principle was the first of the SOLID principles I learned and subsequently blogged about. While this is a personal opinion, I believe that understanding this principle helps you really understand all of the other SOLID principles (and many design patterns for the matter) in a much clearer way. 
+
+
+I also had to include this because the first time I saw this picture it really helped me understand the value and importance of the Dependency Inversion 
+Principle. 
+
+![DIP picture](https://cdn-images-1.medium.com/max/1600/1*oKPt6tRc5YWspA2RoTNTTg.jpeg)
+
+
+
+
+
+
+
+
+
+
