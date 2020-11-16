@@ -1,0 +1,138 @@
+---
+layout: post
+comments: true
+title: Each, Map, & Select
+date: 2017-04-03 13:45:00
+description: Working with common collection methods
+---
+There are many ways to loop through an array or a hash. For instance, you can simply use a `do/while` loop along with a counter, a way to retrieve the current element, and a way to exit the loop.
+<br>
+
+Thankfully, Ruby provides us with some very helpful methods to accomplish such tasks based on what we want do to with our collection. The methods I am referring to are `each`, `select`, and `map`.
+<br>
+
+**Each**
+
+First, let's talk about the `each` method. When called with a block, the each method iterates through each element of the collection. Once it is done iterating, the `each` method always returns the original collection.
+
+
+
+```ruby
+array = [1, 2, 3, 4, 5]
+
+array.each do |number|
+  puts number
+end
+
+# 1
+# 2
+# 3
+# 4
+# 5
+# => [1, 2, 3, 4, 5]
+```
+
+
+
+As you can see in the example above, `each` takes each element in our array and assigns it to `number`. We then call `puts` on `number` which outputs it to the screen. Once it is done iterating, our original array is the return value of the block.
+
+If you were asking yourself, "But `puts` returns nil so why is the return value of the block the original collection?" That is because whatever `each` is called on is the last expression in the method to be evaluated. Alternatively, if we used `each` inside a method and there was additional code following the block, the return value of that method would be different. To illustrate this, see the following example.
+
+
+
+```ruby
+def some_method
+  [1, 2, 3].each do |number|
+    puts number
+  end
+  puts "hello world"
+end
+
+some_method
+
+# 1
+# 2
+# 3
+# hello world
+# => nil       
+```
+
+
+**Select**
+
+Now let's take a look at the `select` method. As the method name indicates, `select` performs selection.
+
+Say you have an array and you want to return an array of all the elements that are less than 10. Reaching for the `select` method would be a good option. `select` returns a **new** collection based on the block's return value. If the return value evaluates to `true`, then that element is selected. The length of the new collection will be the length of the original collection or less.  
+
+
+
+```ruby
+arr = [2, 9, 6, 45, 31, 12, 0]
+
+arr.select do |number|
+  number < 10
+end
+
+# => [2, 9, 6, 0]
+```
+
+
+
+When using `select` it is imperative to pay attention to the block's return value. Say we used the same example as above but decided to call `puts` within the block.
+
+It should be noted, if `select` is called on an array, it returns a new array. When called on a hash, it returns a new hash.
+
+
+
+```ruby
+arr = [2, 9, 6, 45, 31, 12, 0]
+
+arr.select do |number|
+  puts number < 10
+end
+
+# => []
+
+```
+
+
+
+The last line to be evaluated in the block was `puts number < 10` and since `puts` returns `nil`, no elemets were selected. `select` only selects items when the return value is `true`.
+
+
+**Map**
+
+Lastly, we will discuss using `map`. In contrast to `select`, map performs transformation instead of selection. Transformation refers to manipulating *every* element in the collection. `map` returns a new collection based on the block's return value. Each element is transformed based on the return value. In short, `map` returns a new collection of transformed elements.
+
+```ruby
+  [1, 2, 3].map do |number|
+    number + 1
+  end
+
+# => [2, 3, 4]
+
+```
+
+
+So as you can see `map` is a good choice when we want to transform each element in the collection in some way. What if we called `map` on a collection where we wanted to find only the odd numbers?
+
+
+
+```ruby
+[1, 2, 3].map do |number|
+  number.odd?
+end
+
+#=> [true, false, true]
+```
+
+
+
+In the example above we got a return value of an array of booleans. This is because `map` *always* performs transformation based on the return value of the block. In the above example, the return value of the block is a boolean thus an array of booleans was returned (For the above example, `select` would have been a better option).
+
+
+**Enumerable Module**
+
+One last thing I want to touch on before wrapping up is: Why can we call the methods `select` and `map` on arrays and hashes? Because both arrays and hashes have an `each` method in their Class. `select` and `map` are actually methods in the `Enumerable` module. The `Enumerable` module states that as long as the Class has an `each` method, it has access to the entire `Enumerable` module and its methods.
+
+What does `each` have to do with any of this? Well, the `Enumerable` module relies on the `each` method's ability to communicate how to iterate through the collections. As long as the `Enumerable` module knows how to iterate through the collection, it can access all `Enumerable` methods.

@@ -1,0 +1,58 @@
+---
+layout: post
+comments: true
+title: Strong Params
+date: 2017-10-08 15:22:00
+description: Explaining strong parameters in Rails
+---
+
+In the next few days, I will be giving my first lightning talk as part of Phase 3 at DBC and it happens to be on the topic of strong parameters in Rails. As I was preparing for my talk I thought I would flesh out my thoughts on my blog as well.
+
+Strong parameters comes shipped with Rails 4+ by default. In previous versions, it was available through a plugin and/or gem.
+
+In Rails, strong parameters is a way to sanitize user input and have greater control over the sanitation process. The idea of strong params came to fruition in order to deal with mass-assignment vulnerabilities. Mass assignment is updating or assigning multiple attributes at once. Here is an example of standard mass-assignment in Rails.
+
+
+
+~~~ ruby
+user = User.new(params[:user])
+
+# this will raise an ActiveModel::ForbiddenAttributes exception because it's using mass assignment
+~~~
+
+
+
+If we aren't restricting which attributes can be set, a malicious hacker could assign any value to any attribute. The most common example I've been reading about is a hacker setting the value of an `admin` attribute to `true` but it could easily be more dangerous than that.
+
+So, in order to use `params` we have to specify which attributes we want to permit in our controller, which is referred to as whitelisting. With Rails 4 (and subsequent versions), attributes are now whitelisted in the controller before being passed to the model for persistence. In previous versions of Rails, all of this logic lived in the model so this separation of responsibility seems natural and necessary.
+
+
+
+~~~ ruby
+private
+
+  def post_params
+    params.require(:post).permit(:title, :body)
+  end
+
+end
+~~~
+
+
+
+In the example above, I am requiring that the parameter `:post` be present while `permit(...)` grabs the pairs out of that `params[:post]` hash and allows them to be passed to `Post`. If parameters are marked as required and not all required parameters are passed in, it will result in a 400 Bad Request being returned.
+
+However, you do not have to require that parameters are present and can just use `permit` like so.
+
+
+
+~~~ ruby
+def comment_params
+   params[:comment].permit(:name, :body)
+end
+~~~
+
+
+
+These are some basic, yet common ideas to introduce and help understand strong parameters in Rails. In sum, strong parameters purpose is to enhance security and protect attributes from end-user assignment.
+

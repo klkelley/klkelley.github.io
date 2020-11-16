@@ -1,0 +1,158 @@
+---
+layout: post
+comments: true
+title: Proxy Pattern 
+date: 2018-04-03 15:34:00
+description: Working with the Proxy Pattern 
+---
+
+
+Last week one of my mentors suggested that I use the proxy pattern to help me design 
+a particular feature of my HTTP server. I always get really excited when I can learn and apply
+a new design pattern or principle. This particular principle helped me solve an interesting issue 
+however I felt the use cases I was coming across online for the pattern were rather weak which confused me as to how this 
+particular pattern was going to help me.  So we'll talk about the proxy pattern and how you can use 
+it in a non-contrived example. We'll also talk a little bit about memoization. 
+
+
+The proxy pattern provided in the Gang of Four book states: 
+> Allows for object level access control by acting as a pass through entity
+or a placeholder object. 
+
+
+Or put more simply, a proxy is a class functioning as an interface to something else. It acts
+as a wrapper object that is being called by the client to access the real serving object behind the 
+scenes. The typical diagram to represent the proxy pattern looks like this: 
+
+![proxy](https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Proxy_pattern_diagram.svg/439px-Proxy_pattern_diagram.svg.png)
+
+<br> 
+
+#### **Types of Proxies**
+<br/>
+There are four types of proxies under the proxy pattern umbrella. 
+
+**Remote Proxy:**
+The remote proxy is used to represent an object located remotely, usually via a network connection. The local object is a proxy for the remote object. When a method is 
+invoked on the the local object, it results in a method
+being invoked on the remote object. The best example of this type of proxy is an ATM machine. The ATM machine holds proxy objects for bank information that exists in
+a remote server. 
+
+**Virtual Proxy:**
+Virtual proxies are used commonly to delay the creation 
+and initialization of expensive objects until needed. The
+most common example of the virtual proxy is delaying the displaying of images until absolutely necessary. These proxies can also be used to provide some default result
+while the actual result is being produced. 
+
+**Smart Proxy:**
+It can be used to provide an additional layer of security 
+by interposing additional actions when an object is accessed. An example would be counting the number of times
+an object has been accessed and denying access if a certain
+number has been reached. 
+
+**Protective Proxy:**
+It is mainly used to control access rights to an object. 
+It acts as an authorization layer to verify whether the
+user has access to certain content. The proxy checks
+whether the caller has the access permissions required
+prior to forwarding the request. A common example of
+this is when a company uses a proxy server which restricts
+certain websites. Only the websites and contents which are
+valid will be allowed and the rest will be blocked. 
+
+
+
+<br> 
+To provide some context, the problem I was trying to solve was in regards to checking if a 
+particular file existed. I had a `PublicDirectory` class that could check if a requested 
+resource (i.e. a file or directory) existed. This means every time a request came in I was 
+hitting I/O and I wanted to avoid that when possible. This is where the proxy pattern came into 
+play. 
+
+When I first read about the pattern and saw similar diagrams I understood the idea of relying
+on the interface and thought it looked very similar to some other patterns I've read about like the Decorator pattern. What I still wondered about was what was the point of going through one object to get to another. What problem does that solve? No matter what, _eventually_ you would need to check if the file existed on the server, right? How does using a "pass through" object solve anything? 
+
+Well, it turns out, using the proxy pattern in conjunction
+with caching is pretty common. Using the proxy pattern and caching results would allow me to 
+avoid hitting IO every single time. Let's take a look at some code. 
+
+
+
+```java 
+
+class PublicDirectory
+ 
+ private PublicDirectory(String path, FileFinder fileFinderCache) {
+    this.fileFinderCache = fileFinderCache;
+    this.documentRoot = Paths.get(path).toFile();
+    this.path = path;
+  }
+
+  // .. 
+
+   public boolean resourceExists(String path) {
+    return fileFinderCache.resourceExists(documentRoot+path);
+  }
+}
+
+```
+
+
+
+The `PublicDirectory` class takes an instance of 
+`FileFinderCache` which is the **proxy** class. When asked if a resource exists, 
+it will delegate to the proxy (`fileFinderCache`). 
+
+
+
+```java 
+public class FileFinderCache implements FileFinder {
+  private final FileFinder fileFinder;
+  private Map<String, Boolean> cache = new HashMap();
+
+  public FileFinderCache(FileFinder fileFinder) {
+    this.fileFinder = fileFinder;
+  }
+
+  @Override
+  public boolean resourceExists(String path) {
+    Boolean requestedFiles = cache.getOrDefault(path, null);
+    if (requestedFiles == null) {
+      cache.put(path, fileFinder.resourceExists(path));
+    }
+    return cache.get(path);
+  }
+}
+
+
+public class RealFileFinder implements FileFinder {
+  @Override
+  public boolean resourceExists(String path) {
+    File resource = Paths.get(path).toFile();
+    return (resource.exists()) && resource.isDirectory() || resource.isFile();
+  }
+}
+```
+
+
+
+`FileFinderCache` in turns takes an instance of `FileFinder` which is our **real subject** 
+(refer to diagram above for reference). The interesting part comes into play is if a 
+requested file hasn't been requested before, we'll add the path to our HashMap and ask
+our `RealFileFinder` to see if the resource exists. This means, on subsequent calls, the answer 
+(in this case a boolean) will be stored in our HashMap which means we don't need to ask 
+`RealFileFinder` to do any heavy lifting, resulting in less hits to the IO. 
+
+Prior to applying this pattern, I was going straight to the IO to see if a resource existed 
+even it had been requested 30 seconds ago. Do we eventually have to hit IO to see if a resource
+exists? Yes. Do we have to do it every time for that same resource? No. It's a one and done. 
+
+The downfalls of caching could be that when we create a new resource via a `POST` request 
+(which requires to see if that resource exists before creating it) we will be caching that 
+result right before potentially creating the resource. This means an immediate
+`GET` request for that resource could result in a `404 Not Found`. A workaround might involve
+clearing the cache periodically or bypassing the proxy for `POST` requests. This something that
+I'll likely have to explore in the future. 
+
+
+

@@ -1,0 +1,229 @@
+---
+layout: post
+comments: true
+title: Composite Pattern 
+date: 2018-04-05 19:34:00
+description: Using the Composite Pattern  
+---
+
+
+I'll keep the theme going this week about patterns I've learned about recently. 
+
+The composite pattern is defined as: 
+> Composite pattern is a partitioning design pattern and describes a group
+of objects that is treated the same was as a single instance of the same object. 
+
+The intent of this pattern is to compose objects into tree structures to represent part-whole hierarchies. This allows you to ask each node in the tree structure to perform a task. 
+
+
+Here is an example tree like structure that illustrates the Composite Pattern: 
+<br/>
+
+![composite-tree](http://openturns.github.io/openturns/master/_images/composite_tree.png)
+
+
+As you can see from the diagram above, the composite pattern has 3 main components: 
+
+
+1. Component: The component declares the interface for objects in the composition. It can also implement default behavior for the interface common to all classes as appropriate 
+
+2. Leaf: Leaf defines behavior for primitive objects in the composition. It represents leaf objects in the composition. 
+
+3. Composite: The composite stores child components and implements child related operations in the component interface. 
+
+
+As always, here's a basic UML diagram that illustrates the pattern: 
+
+
+![composite](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Composite_UML_class_diagram_%28fixed%29.svg/600px-Composite_UML_class_diagram_%28fixed%29.svg.png)
+
+
+If that doesn't quite make sense let's first talk about when you'd want to use this pattern. I really find use-cases to be helpful in understanding alot of the design patterns. This pattern is a great candidate when clients need to ignore the difference between composition of objects and individual objects. For instance, if you find that you are using multiple objects in the same way and each of those objects has nearly identical code to handle them, composite pattern is a great choice. 
+
+Let's talk about a more concrete example. Consider an organization with a CEO
+and hundreds of employees. You need to find the total salary paid to all the employees
+of the organization. That is, it's the CEO's salary + the salary paid to all 
+departments. How do we find the salary of each department? It's the salary of
+the department heads + the salary of managers. How do we find the salary of all
+the managers? It's the salary of the managers + the salary of their subordinates. 
+This can go on and on.
+
+We'll try our hand at some code using a smaller organization though. We want
+to get the salary of all employees from top to bottom. 
+
+
+
+
+
+```java 
+public abstract class Employee {
+  public void add(Employee employee) {
+    throw new UnsupportedOperationException("Cannot add new employee.");
+  }
+  public void remove(Employee employee) {
+    throw new UnsupportedOperationException("Cannot remove an employee.");
+  }
+  public double getSalary(); 
+  public String getName(); 
+  public void print(); 
+}
+
+```
+
+
+
+Our abstract class `Employee` is our **Component**. You'll notice that
+`add` and `remove` throw exceptions by default. This is because
+this behavior is irrelevant to our leafs and it some code accidentally
+calls these methods on a leaf an exception will be raised. 
+
+
+
+
+```java 
+public class Manager extends Employee {
+  private double salary; 
+  private String name;
+  private List<Employee> employees = new ArrayList<>();
+
+  public Manager(String name, double salary) {
+    this.name = name;
+    this.salary = salary;
+  }
+
+  @Override
+  public void remove(Employee employee) {
+    employees.remove(employee);
+  }
+
+  @Override
+  public void add(Employee employee) {
+    employees.add(employee);
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public double getSalary() {
+    return salary;
+  }
+
+  @Override
+  public void print() {
+    System.out.println("-------------");
+    System.out.println("Name ="+getName());
+    System.out.println("Salary ="+getSalary());
+    System.out.println("-------------");
+
+    for (Employee employee : employees) {
+      employee.print();
+    }
+  }
+}
+
+```
+
+
+
+
+Our `Manager` class is our **composite**.
+
+
+
+```java
+public class Developer extends Employee {
+  private String name;
+  private double salary;
+
+  public Developer(String name, double salary) {
+    this.name = name;
+    this.salary = salary;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public double getSalary() {
+    return salary;
+  }
+
+  public void print() {
+    System.out.println("-----------");
+    System.out.println("Name: " + getName());
+    System.out.println("Salary: "+ getSalary());
+    System.out.println("-----------");
+  }
+}
+
+``` 
+
+
+
+The developer class is a **leaf** and since it's a leaf, we don't have to worry about
+children. This is why the `Developer` class only provides implementation for `getName`, `getSalary` and `print`. 
+
+
+```java 
+public class Company {
+  public static void main (String[] args) {
+    Employee employee1 = new Developer("Kara", 100000);
+    Employee employee2 = new Developer("Mike", 100000);
+    Employee employee3 = new Developer("Aaron", 100000);
+    Employee manager = new Manager("Someone", 150000);
+    manager.add(employee1);
+    manager.add(employee2);
+    Manager generalManager = new Manager("Someone Else", 150000);
+    generalManager.add(employee3);
+    generalManager.add(manager);
+
+    generalManager.print();
+  }
+}
+
+
+-------------
+Name: Someone Else
+Salary: 150000.0
+-------------
+-----------
+Name: Aaron
+Salary: 100000.0
+-----------
+-------------
+Name: Someone
+Salary: 150000.0
+-------------
+-----------
+Name: Kara
+Salary: 100000.0
+-----------
+-----------
+Name: Mike
+Salary: 100000.0
+-----------
+
+
+```
+
+
+
+So when we create some employees and managers for our company. We can ask the 
+highest ranking manager (i.e. `generalManager`) to get the names and salaries
+of all employees. This process continues until it reaches just the leaves as
+we explained in the initial example above. 
+
+
+One of the things I don't particularly like about this pattern is that if you
+use interfaces or even abstract classes, the leaf class has to either provide an 
+empty implementation of some methods (violation of the Interface Segregation Principle) or rely on a default implementation (in our case
+this was an exception being thrown). It just seems a bit like a code smell
+but overall, this pattern is pretty cool. 
+
+
+That's wrap on composite patterns but I have a strong feeling the following post will be about another design pattern as well, stay tuned. 

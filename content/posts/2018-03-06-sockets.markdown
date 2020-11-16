@@ -1,0 +1,43 @@
+---
+layout: post
+comments: true
+title: The role of Sockets 
+date: 2018-03-07 10:03:00
+description: What's a socket? 
+---
+
+This week I began my HTTP server project in Java. It is nice have some familiarity in Java
+because there are many aspects about building a server that are very foreign to me. Of course,
+I will likely learn alot more about Java along the way as well. Essentially, the HTTP Server
+will prove to be a great learning experience all-around. 
+
+What's a socket? I'm not talking about the type of socket you insert a lightbulb into. However,
+that mental model may not be harmful, either. I will do my best at making some real-world analogies
+along the way because I always find they help me understand new concepts the best. 
+
+Without sockets, most of the network communication between system wouldn't be possible. They're essential to establishing communcation between two entities in networks. 
+
+A socket is a software endpoint that establishes bidirectional communication between a server program
+and one or more client programs. The best analogy to use here (and going foward) is a telephone. A phone
+can represent a socket well in the way that a phone is used to allow one person to speak to another;
+bidirectional communication.
+
+A socket has a typical flow of events. In the client-to-server model, the socket on the server
+process waits for requests from a client. In order to do this, however, the server must first establish
+(bind) an address that clients can use to find the server. In standard internet protocols (i.e. TCP) the socket address is the combination of an IP address and a port number. Think of the IP address as a telephone number and the port as the extension. When the address has been established, the server waits for clients to request a service/resource. The client-to-server data exchange takes place when a client connects to the server through a socket. The server performs the client's request and sends the reply back to the client. Once it sends a reply
+the connection is terminated by the client. 
+
+Here is a basic diagram that illustrates this 
+process that I've just described. 
+
+![socket-example](https://www.tutorialspoint.com/perl/images/perl_socket.jpg)
+
+If we revisit the phone analogy, it would be similar to your friend calling
+you at home. Your friend has to have a phone (socket) and they must  know your phone number (address) in order
+to contact you but you don't need to know their number in order to answer the call. You are just 
+sitting around all day waiting for your friend to call (waiting on client connection). When the telephone rings, you pick it up (accept the client connection) and begin to exchange data. In this case,
+though, the data is back and forth conversation. Once the conversation is complete, your friend hangs
+up (terminates the connection) and you begin waiting until they call again. Unlike with a telephone though, you can still accept calls while processing previous connections.
+
+I feel that the telephone analogy alone
+has helped me understand the purpose and role of sockets in a way that really helps me form a mental model. There are many deep rabbit holes you can dive into when it comes to networking, sockets, and the internet in general however I have a good feeling some posts along those lines will be coming in the future. 

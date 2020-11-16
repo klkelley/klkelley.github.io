@@ -1,0 +1,151 @@
+---
+title: Intro to Ruby Collections
+date: 2017-01-08 17:15:00
+description: Element reference & assignment
+---
+When working with data in Ruby we need to store it somewhere in structured containers, or collections. The most common collection types in Ruby are `Hash`, `Array`, and `String`.
+
+### Element reference
+<br>
+#### Strings
+<br>
+Strings use an integer based index that represent each character in a string. Indexes start at zero and increase by one for each value in the index.<br>
+Consider the following string:
+
+
+
+```ruby
+string = "abcde"
+
+string[0] # => "a"
+string[1] # => "b"
+```
+
+
+
+You can also reference multiple characters in a string by using an index starting point and the number of characters to return. For example if we wanted to return the word "sky":
+
+
+
+```ruby
+string = "The sky is blue"
+
+string[4, 3] # => "sky"
+```
+
+
+
+We first find the index where sky begins which is 4, then how many characters to return (i.e. 3).
+It should be noted that in the example above using `string[4, 3]` is simply a call to the `String#slice` method. The example shows an alternative way of using the `String#slice` method. You could of course use the standard `String#slice` method by calling `string.slice(4, 3)`.
+
+#### Arrays
+<br>
+Indexes are often most associated with arrays, with that said, we can search arrays in the same way we did with the string examples above.
+
+
+
+```Ruby
+arr = ['a', 'b', 'c', 'd', 'e']
+
+arr[1] # => "b"
+arr[3] # => "d"
+```
+
+
+Array indexes (as well as strings) can be accessed using negative indices. Negative indices begin at -1 which references the last item in the array and increments with each index position.
+
+
+
+```ruby
+ array = ['a', 'b', 'c', 'd', 'e']
+ string = 'abcde'
+
+ array[-3] # => "c"
+ string[-3] # => "c"
+```
+
+
+
+`Array` also has a slice method, although it is similar to the `String#slice` method it is different in the fact that  `Array#slice` returns and new array and `String#slice` will return a new string like so:
+
+
+
+```ruby
+array = [1, "two", "three", "4", 5]
+
+arr[3] # => "4"
+arr[3, 1] # => ["4"]
+```
+
+
+
+### Element Assignment
+<br>
+#### Strings
+<br>
+You can use `String` element assignment to change the value of a specific character in a string by referring to the index.
+
+
+
+```ruby
+string = "kara's favorite color is green"
+
+string[0] = "K"
+string # => "Kara's favorite color is green"
+```
+
+
+
+Knowing we can do this, we will go ahead and capitalize each word.
+
+
+
+```ruby
+string[7] = "F"
+string[16] = "C"
+string[22] = "I"
+string[25] = "G"
+string # => "Kara's Favorite Color Is Green"
+```
+
+
+
+It is important to note that this way of modifying the string is destructive thus the string will be permanently modified.
+
+#### Arrays
+<br>
+We can assign elements in an `Array` in the same way:
+
+
+
+```ruby
+array = [1, 2, 3, 4, 5]
+
+array[0] += 1 # => 2
+array # => [2, 2, 3, 4, 5]
+```
+
+
+
+Again, this method is also destructive in that it permanently modifies the array.
+
+#### Hashes
+<br>
+Assigning elements in a `Hash` is somewhat similar but instead of using an index, a hash key is used.
+
+
+
+```ruby
+foods = { apple: "produce", celery: "produce" }
+
+foods[:apple] = "fruit"
+foods[:celery] = "vegetable"
+foods # => {:apple => "fruit", :celery => "vegetable"}
+```
+
+
+
+<br>
+<br>
+These are basic ways to reference and assign elements to Ruby collections but are also fundamental in working with collections.
+<br>

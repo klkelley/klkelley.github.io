@@ -1,0 +1,118 @@
+---
+layout: post
+comments: true
+title: Achieving Polymorphism in Clojure 
+date: 2018-03-01 14:23:00
+description: The power of multimethods
+---
+
+In prior Tic Tac Toe projects I relied on duck typing in Ruby and interfaces in Java to aid me
+in adhering to the the open-closed principle and having polymorphism. 
+
+Specifically, all of my player objects would respond to `makeMove()` functions or the like. Each player
+had it's own implementation of how it chose a move on the board. As long as they implemented
+that interface (in Java) or that method was defined within it's class (in Ruby), it didn't
+matter about the implementation as long as they responded to the message. 
+
+In my recent Clojure TTT I had a `human` player and a `computer` player; each had their own way
+of choosing a spot on the board. The problem was I didn't have duck typing or interfaces to rely on. 
+I ended up with something like this: 
+
+
+
+```clojure 
+(defn next-move
+  [current-player next-player board]
+  (if (= (current-player :type) :human)
+    (get-human-move board)
+    (get-computer-move board current-player next-player)))
+
+```
+
+
+
+One of my mentors pointed out that I wasn't adhering to the OCP and they were right. If I were to ever
+introduce other types of players (think different difficulties of an AI player) then I would have to go
+back and re-open my code. But, how do I make this flexible without duck typing or interfaces? In my last
+post, after all, we talked about how design principles can (and should) still be applied in functional 
+languages.
+
+It turns outs, Clojure supports runtime polymorphism through a multimethod system which supports dispatching on types, values, attributes, and metadata of, and relationships between, one or more arguments. 
+
+Defining a  multimethod is a combination of a dispatching function, and one or more methods. If you
+read that again it sounds like exactly what we need! But it is still rather confusing. Let's break it down a little. 
+
+
+We can define a multimethod using `defmulti` along with a dispatching function. The dispatching function
+is applied the arguments to the multimethod in order to produce a dispatching value. Let's look at an example of this before moving on. 
+
+
+
+```clojure
+(defmulti ^:private move 
+  (fn [current-player next-player board] (current-player :type)))
+
+```
+
+
+
+Here we've defined the first part of our multimethod. We pass in `current-player` `next-player` and
+`board` for two reasons: 1. We need to pass those along as arguments depending on the current player type (refer to the first example) 2. We need to check the type of player (this is our dispatching value) to determine which method is associated with the dispatching value.
+
+
+Ok, I hope you're still with me. Now that we have the first part of our multimethod, the `move`
+function will now try to find the method associated with the dispatching value. In our case the dispatching value will either be `:computer` or `:human`. We can achieve this by using `defmethod` which
+is the other part of the multimethod combination.
+
+
+
+```clojure
+(defmethod ^:private move :human 
+  [current-player next-player board] 
+  (ui/get-human-move (board/available-spaces board)))
+
+(defmethod ^:private move :computer 
+  [current-player next-player board] 
+  (ai/get-computer-move board (current-player :marker) (next-player :marker)))
+```
+
+
+
+So, if the `current-player` type evaluates to `:human`, it will call the first function above which
+then calls `get-human-move`! The same applies if the `current-player` evaluates to `:computer`, it will
+call the second function with calls `get-computer-move`. Ok, this is really cool if you ask me! 
+
+But how does this all tie together, how do we actually use it during game play? Here's everything together:
+
+
+
+
+```clojure 
+(defmulti ^:private move 
+  (fn [current-player next-player board] (current-player :type)))
+
+(defmethod ^:private move :human 
+  [current-player next-player board] 
+  (ui/get-human-move (board/available-spaces board)))
+
+(defmethod ^:private move :computer 
+  [current-player next-player board] 
+  (ai/get-computer-move board (current-player :marker) (next-player :marker)))
+
+; ^^ our multimethod 
+
+(defn ^:private next-move
+  [current-player next-player board]
+  (move current-player next-player board))
+
+;; ^^ how we use the multimethod
+```
+
+
+
+
+As you can see, the last function, `next-move` utilizes the multimethod which then evalutes
+the dispatching value (i.e. our current-player) and calls the appropriate function. This means
+that if we add other types of players we can **extend** our code by adding a new `defmethod` to
+support the new player's move strategy. It adheres to OCP and is polymorphic. It's a win win. 
+This is also one of the reasons I've become keen to Clojure; it's simplistic yet intuitive. 

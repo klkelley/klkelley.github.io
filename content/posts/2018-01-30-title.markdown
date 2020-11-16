@@ -1,0 +1,273 @@
+---
+layout: post
+comments: true
+title: State Pattern
+date: 2018-01-30 9:46:00
+description: What's the State Pattern? 
+---
+
+The State Pattern is defined as:
+> "Allows an object to alter its behavior when its internal state changes. The object will appear 
+to change its class"
+
+This pattern is a behavioral pattern, like the strategy pattern, and it's used to manage
+algorithms, relationships and responsibilities between objects. Said another way, it allows
+objects to behave in different ways depending on the interal state. 
+
+This pattern is used when you need a class to behave differently, based on some arguments 
+passed through the class at runtime. So if we need to change behavior of an object based on its
+state, we can have a state variable in the Object. The State Pattern helps to provide a loosely
+coupled way to achieve this with `Context` and `State` implementations. 
+
+Here is a generic class diagram that implements the State Pattern: 
+
+![uml-diagram](http://www.thejavageek.com/wp-content/uploads/2016/10/Generic-State-Design-Pattern.jpg "State Pattern")
+
+`Context`: Used by clients of the state pattern; clients do not access the state objects directly. It maintains references to concrete state object which may be used to define the current state of the object.
+
+`State`: Defines an interface for declaring what each concrete state should do.
+
+`ConcreteState`: Provides implementation for methods defined in `State`.  
+
+
+If you're thinking this looks similar to the Strategy Pattern, you're right. They are similar but they are different in their intent. The Strategy pattern's intent is to have a family of interchangable algorithms which can be chosen based on the client's need while the state pattern's intent is to manage the states of the object. 
+
+
+As usual, I think this is best demostrated by starting off with an example then we will refactor it using the 
+State Pattern. 
+
+Say we have to build an application for a soda vending machine. A vending machine as four different states: No coin inserted, coin inserted, dispensing, and empty. This is one way we could build it. 
+
+
+```java 
+public class SodaVendingMachine {
+  final static int NO_SODA = 0; 
+  final static int NO_COIN = 1;
+  final static int CONTAINS_COIN = 2;
+  final static int DISPENSE = 3;
+  int count;
+  int state = NO_SODA;
+
+  public SodaVendingMachine(int numberOfSodas) {
+    this.count = numberOfSodas;
+    if (count > 0) state = NO_COIN;
+  }
+
+  public void insertCoin() {
+    if (state == CONTAINS_COIN) {
+      System.out.printlin("Coin already inserted.");
+    } else if (state == NO_COIN) {
+      state = CONTAINS_COIN;
+    } else if (state == NO_SODA) {
+      System.out.println("No soda available!");
+    } else if (state == DISPENSE) {
+      System.out.println("Error. System is currently dispensing soda.");
+    }
+  }
+
+  public void pressButton() {
+    if (state == CONTAINS_COIN) {
+      state = DISPENSE;
+    } else if (state == NO_COIN) {
+      System.out.println("Please insert coin");
+    } else if (state == NO_SODA) {
+      System.out.println("No soda available");
+    } else if (state == DISPENSE) {
+      System.out.println("Please insert coin");
+    }
+  }
+
+  public void dispense() {
+    // you get the point.. 
+  }
+} -->
+
+```
+
+
+This has already become hard to read and is clearly a violation of the Single Resonsibility Principle as we have the same pieces of knowledge spread in several different places. Also, what if our soda machine received an upgrade and we needed to add new functionality? We would have to modify the class which is an Open-Closed Principle violation. The way we can apply the State Pattern here is by encapsulating each of these `if/else` branches in its own class. We need to encapsulate what _varies_. 
+
+Here's how we can refactor it. 
+
+
+
+```java 
+public interface SodaVendingMachineState {
+  void insertCoin();
+  void pressButton();
+  void dispense();
+}
+
+// this is our State interface
+```
+
+
+
+
+```java 
+public class NoCoinState implements SodaVendingMachineState {
+  SodaVendingMachine machine;
+
+  public NoCoinState(SodaVendingMachine machine) {
+    this.machine = machine;
+  }
+
+  public void insertCoin() {
+    machine.setState(machine.getContainsCoinState());
+  }
+
+  public void pressButton() {
+    System.out.println("Please insert a coin");
+  }
+
+  public void dispense() {
+    System.out.println("Please insert a coin");
+  }
+}
+
+public class ContainsCoinState implements SodaVendingMachineState {
+  SodaVendingMachine machine;
+
+  public ContainsCoinState(SodaVendingMachine machine) {
+    this.machine = machine;
+  }
+
+  public void insertCoin() {
+    System.out.println("Coin already inserted.");
+  }
+
+  public void pressButton() {
+    machine.setState(machine.getDispensedState());
+  }
+
+  public void dispense() {
+    System.out.println("Press button to dispense")
+  }
+}
+
+public class DispensedState implements SodaVendingMachineState {
+  SodaVendingMachine machine;
+
+  public DispensedState(SodaVendingMachine machine) {
+    this.machine = machine;
+  }
+
+  public void insertCoin() {
+    System.out.println("Error. System is currently dispensing");
+  }
+
+  public void pressButton() {
+    System.out.println("Error. System is currently dispensing.");
+  }
+
+  public void dispense() {
+    if (machine.getCount() > 0) {
+      machine.setState(machine.getNoCoinState());
+      machine.setCount(machine.getCount() - 1);
+    } else {
+      System.out.println("No sodas available");
+      machine.setState(machine.getNoSodaState());
+    }
+  }
+ }
+
+ public class NoSodaState implements SodaVendingMachineState {
+  SodaVendingMachine machine;
+  // ..
+  // ..
+ }
+
+ // these are the ConcreteStates
+```
+
+
+
+
+Now onto our `Context`... 
+
+
+
+
+```java 
+public class SodaVendingMachine {
+  SodaVendingMachineState noCoinState;
+  SodaVendingMachineState noSodaState;
+  SodaVendingMachineState dispensedState;
+  SodaVendingMachineState containsCointState;
+  SodaVendingMachineState state;
+  int count;
+
+  public SodaVendingMachine(int sodaCount) {
+    count = sodaCount;
+    noCoinState = new NoCoinState(this);
+    noSodaState = new NoSodaState(this);
+    dispensedState = new DispensedState(this);
+    containsCoinState = new ContainsCoinState(this);
+    state = noCoinState;
+  }
+
+  public void insertCoin() {
+    System.out.println("Coin inserted.");
+    state.insertCoin();
+  }
+
+  public void pressButton() {
+    System.out.println("Button pressed.");
+    state.pressButton();
+    state.dispense();
+  }
+
+  public SodaVendingMachineState getNoSodaState() {
+    return noSodaState;
+  }
+
+  public setNoSodaState(SodaVendingMachineState noSodaState) {
+    this.noSodaState = noSodaState;
+  }
+
+  public SodaVendingMachineState getNoCoinState() {
+    return noCoinState;
+  }
+
+  public setNoCoinState(SodaVendingMachineState noCoinState) {
+    this.noCoinState = noCoinState;
+  }
+
+  public int getCount() {
+    return count;
+  }
+
+  public void setCount(int count) {
+    this.count = count;
+  }
+
+  public void setState(SodaVendingMachineState state) {
+    this.state = state;
+  }
+
+  public SodaVendingMachineState getContainsCoinState() {
+    return containsCoinState;
+  }
+
+  public void setContainsCoinState(SodaVendingMachineState containsCoinState) {
+    this.containsCoinState = containsCoinState;
+  }
+
+  public SodaVendingMachineState getDispensedState() {
+    return dispensedState;
+  }
+
+  public void setDispensedState(SodaVendingMachineState dispensedState) {
+    this.dispensedState = dispensedState;
+  }
+}
+
+```
+
+
+
+
+So in our `Context` (i.e. `SodaVendingMachine`) we defined instance variables for all the different states available and we have an instance variable `state` that keeps track of the current state of the machine. In `pressButton()` and `insertCoin()` we delegate the call to those methods to the current state object. The rest of the methods are simply getter and setter methods. 
+Each of the different states are now encapsulated in their respective classes and they are closed for modification. If we have a new state we can create a new class. You can also see that we removed the need for all of the `if/else` clauses that we relied on in our first iteration of this sample application. 
+
+This is a great pattern to apply if you need to alter the behavior of an object based on it's internal state. 

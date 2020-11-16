@@ -1,0 +1,85 @@
+---
+layout: post
+comments: true
+title: SOLID&#58; Single Responsibility Principle
+date: 2018-01-16 15:40:00
+description: Diving into into SRP
+---
+
+For the next few posts I will be focusing on each each of the SOLID principles.
+The first principle is the Single Responsibility Principle, which I lightly touched on in a
+[previous post](https://www.karakelley.me/2018/01/05/title.html).
+
+The Single Responsibility Principle states "_A class or module should have only one reason to change_".
+
+When I first read that definition I wondered, what constitutes as change? One of the statements I read
+in Agile Software Development: Principles, Patterns, and Practices really stuck. _Each responsibility is an axis
+of change_". If a class or module has more than one *responsibility* then it has more than one reason to change.
+In essence, SRP isn't just about change but also responsibility; they are intertwined.
+
+One of the first software design books I read was POODR (Practical Object Oriented Design in Ruby) by Sandi Metz and she states that if you describe your class or module using the word "and" or "or" then your class or module
+has more than one responsibility. I find using that rule of thumb as a helpful way in identifying SRP violations.
+
+Let's illustrate a violation of the Single Responsibility Principle using some examples.
+
+
+
+```
+public class Game() {
+
+  public void takeTurn() {
+  	//..
+  }
+
+  public boolean tie() {
+  	//..
+  }
+
+  public boolean winner() {
+  	//..
+  }
+}
+```
+
+
+
+At this point, here is what the `Game` class is responsible for:
+1. Taking turns between players (`takeTurn()`)
+2. Game rules (`tie()` and `winner()`)
+
+
+This means that `Game` is responsible for game flow *AND* rules. The `Game` class has two reasons to change right now meaning that it is in clear violation of the Single Responsibility principle. If any changes need to be made to the rules then the likelihood of it negatively impacting the game flow is rather high. In a way, it does make sense that a `Game` should know how about game flow and if a game has been won but I think changing course in the class names would help figure out where these responsibilities really belong.
+
+A `GameRules` or `GameState` class would be more appropriate for determining if the game is won while a `Game` would be responsible for game flow. Let's refactor our code example to adhere to SRP.
+
+
+
+
+```
+public class Game() {
+
+  public void takeTurn() {
+  	//..
+  }
+}
+
+public class GameRules() {
+
+  public boolean tie() {
+  	//..
+  }
+
+  public boolean winner() {
+    //..
+  }
+}
+```
+
+
+
+Now that we've refactored, if we need to implement new game rules logic, only `GameRules` needs to change. If we
+need to add a new feature that changes game flow, only `Game` needs to change.
+
+One thing I want to note is that SRP is not just applicable to classes. It can (and should) be applied to methods and functions as well, which is something I have failed to remember at times. As I've worked on getting better at Test-Driven Development I can't help but notice how much using a test-driven approach has helped separate responsibilities from the beginning.
+
+The Single Responsibility principle helps us achieve cohesion and reduces coupling and fragility in our code. Applying SRP results in several benefits including: easier to understand code, increased maintainability, and increased reusability. I foresee the theme of SRP being present in the upcoming posts for each of the SOLID principles.

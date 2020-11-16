@@ -1,0 +1,50 @@
+---
+layout: post
+comments: true
+title: Beyond Unit Testing
+date: 2018-03-09 07:45:00
+description: Acceptance testing & Inside-Out vs Outside-In
+---
+
+
+For the past few weeks I've been reading Growing Object-Oriented Software (GOOS), Guided by Tests by Steve Freeman and Nat Pryce. I'm continually amazed at how much I've learned just by reading technical books throughout my apprenticeship. I'm also amazed at the amount I'm learning about TDD and writing tests. 
+
+I've already written a post about TDD patterns which are helpful in getting the hang of a TDD workflow. I'd recommend checking out that [post](https://www.karakelley.me/2018/02/08/TDD-patterns.html) if you haven't read it. 
+
+I'm going to be honest here, I thought TDD was about unit testing. I wasn't completely aware that there were different types of tests. I'd been exposed to some acceptance testing for web applications using Capybara testing framework but that's about it. I'm not going to talk about frameworks though. 
+
+In the last two projects that I've completed during my apprenticeship, I've written unit tests to build out my application right from the start. This also referred to as an Inside-Out TDD approach. This allowed me to focus on one thing at a time, building up classes incrementally and later wiring the whole system together. The problem with this approach, for me at least, is wiring the system together down the road. I found it difficult to get everything to work togther and still have good design. 
+
+Think of a Tic Tac Toe game. You have Players, a Board, a User Interface, and a Game (among some other entities). Those first three entities seem like the easiest to start off with. Using an Inside-Out approach you could start off with a Board class and build it incrementally. You can then move onto the other entities and later wire everything together and create a Game class. Starting off this way makes
+alot of sense to me because you can't test a game without a board, right? Well that's kind of true but if we think beyond unit testing we can take a different approach. 
+
+The most significant concept I've picked up from reading GOOS thus far is acceptance testing which is closely related to taking an Outside-In TDD approach. The idea is to focus on the system as a whole right from the start. If we stick with our TTT example, this means our first test would be to write an acceptance test for the Game class which would encompass the entire application including game flow. 
+
+My mentors pushed me to do this early on in my apprenticeship and I really struggled to take this approach. I found it hard to think about the system as a whole and thought "what about unit testing?!". This was also right around the time I was reading Kent Beck's TDD book which tends to focus mostly on unit testing. Well, writing acceptance tests doesn't mean you don't write unit tests as well. It does require you to know how all the entities will interact with each other and to know how the system should work. Without that knowledge, taking an Inside-Out approach would probably be more suitable. 
+
+So, how do you write an acceptance test for the Game class when you don't have players or a board? In GOOS, they suggest using mocked or stubbed out entities which allows the details of those classes to be deferred until later. Incrementally, you loop back and provide real implementation for each of those stubbed out classes through **unit tests**. Ideally, once you're done, you'll have fully tested classes along with end-to-end tests for the entire application. 
+
+Acceptance tests aren't just for testing an "entire application" at the very beginning but they can (and should) be used for each feature or user stories. For each feature, the first test will be how that new feature will work. 
+
+Taking the Outside-In approach also allows you to focus on how all the entities will interact rather than the implementation details. For me, this has been important. I find it really easy to get hung up on the internal details of classes and lose sight of the system as a whole. 
+
+I recently tried this approach on my first story for my HTTP Server and was so amazed at being able to think about the system as a whole instead of the implementation details. The important thing to note is that I'm not necessarily favoring one approach over the other. Outside-In approach is just new to me and something that I've found to be helpful. There are situations where one approach will be more suitable over the other. There are alot of things in software development that are not black and white and trade-offs must be considered; another thing I'm trying to get better at! 
+
+
+### Summary: Levels of Testing 
+<br>
+
+1. Acceptance: Does the whole system work? 
+2. Integration: Does our code work againg code we can't change (i.e. 3rd party libraries)?
+_note: we didn't talk about this one so I'll save that for another day!_
+3. Unit: Do our objects do the right thing? Are they convenient to work with? 
+
+
+
+### Summary: Inside-Out Vs. Outside-In
+<br>
+
+* **Outside-In** focuses on starting off with an acceptance test and favors focusing on the system as a whole. This is an ideal approach when you have a general idea of how the system will work and can understand how all the entities will work together. 
+
+* **Inside-Out** focuses on building out functionality one piece at a time and wiring entities together at a later stage. This is an ideal approach to take when you don't understand how all the entities will interact. It allows you to take small steps and focus on internal behavior. 
+

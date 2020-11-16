@@ -1,0 +1,71 @@
+---
+layout: post
+comments: true
+title: What's Maven?
+date: 2018-01-03 15:00:00
+description: Reasons for a build tool in Java
+---
+This week I began my resident apprenticeship at 8th Light in Chicago. One of my first projects
+is to build a Tic Tac Toe game in Java. My first task is to get a project skeleton setup using Maven.
+I checked out the Maven documentation along with a few articles and I picked up pretty
+quickly that Maven is a build tool used for Java projects. After a while, a question still lingered,
+what's a build tool and why do I need it?
+
+I should note that aside from a very brief stint using Swift, I've only worked with interpreted languages.
+My programming background has mostly been in Ruby and JavaScript up to this point.
+
+In order for me to wrap my head around the idea of a build tool I realized I needed to take
+a few steps back and understand a few basic things about Java and compiled languages.
+
+I kept seeing the word "build" being thrown around a lot. Initially, I assumed
+this was another term used for compiling. It turns out that *building* is the process
+of sequences that includes compiling source code, linking, and packaging into an executable form. Wow, that's alot!
+Having a better understanding of what a build process entails helped me gain better
+understanding of the basic necessity of a build automation tool.
+
+So Maven not only handles the automation of the build process as mentioned above,
+but also dependency management and running unit tests, to name a few.
+
+Maven is centered around the idea of POM files (Project Object Model). The POM file, which is an XML file,
+is essentially a configuration file. The POM file should be located in the root directory
+of the Java project and typically contains build profiles, build plugins, dependencies,
+and build life cycles. I mentioned dependency management above; one of the first goals of Maven
+is to check the dependencies listed in the file. If the dependencies are not found
+in the local repository, Maven will automatically download them for you!
+
+Build process in Maven are split up into different types of "build life cycles".
+Each build life cycle consists of a sequence of build phases. I like think of them as
+pre-packaged commands that execute different tasks.
+
+There are three built-in lifecycles: `default`, `clean`, and `site`.
+
+When you execute `$ mvn default` it executes the following phases *sequentially*:
+
+* `validate` - validates if the project is correct and checks to see if all necessary information is available.
+* `compile` - it compiles all of the source code within the project.
+* `test` - tests the compiled source code is suitable for the testing framework.
+* `package` - takes the compiled source code and creates a JAR/WAR package
+* `verify` - run any checks to verify the package is valid and meets the criteria.
+* `install` - installs the package in the local repo
+* `deploy` - completed in an integration or release environment and copies the final package to the remote
+repo for sharing with other projects and/or developers
+
+`$ mvn clean` executes `pre-clean`, `clean`, and `post-clean`. This build life cycle
+executes each of these phases and its purpose is to clean, or remove, all files and cached
+output from the previous build. If, for instance, you rename a class, the previous compiled
+version remains in the directory `target/classes` which could cause issues. This ensures you are getting the latest
+information. Also, certain plugins may require `clean` to be run in order to work properly.
+
+It should be noted that each of theses phases mentioned in the list above can also
+be executed individually. For instance, I can run `$ mvn test` or `$ mvn package` in order to execute
+that phase individually.
+
+An entire list of life cycles and build phases can be found [here](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Lifecycle_Reference).
+
+I've still got plenty to learn about the power of Maven. One of the things I like
+is the way it stresses convention over configuration. This helps get up and running faster
+and shields many of the details and work done behind the scenes. This reminds me a little
+bit of Rails but at the same time it can be difficult to understand what's truly going on
+in the background and appreciate all of the automation.
+
+I look forward to delving deeper into Maven and Java, for that matter.

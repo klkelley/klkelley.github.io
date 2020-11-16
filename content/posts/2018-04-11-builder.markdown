@@ -1,0 +1,196 @@
+---
+layout: post
+comments: true
+title: Builder Pattern
+date: 2018-04-11 12:40:00
+description: Building objects with builder pattern 
+---
+
+
+The intent of the builder pattern is to: 
+> Separate the construction of a complex object from its representation
+so that the same construction process can create different representations
+
+In a nutshell, it's concerned with the creation of objects. I know off the top of my
+head there is another pattern that is also concerned with the creation of objects, 
+the factory method pattern. There may be more that I am not aware of. So, why do we 
+need another pattern for creating objects? 
+
+
+While its true the builder pattern is concerned with the creation of objects, it really helps to solve problems like too many arguments in a constructor. You don't realize this is a problem to solve until you actually have an object that takes multiple parameters and you continually forget the order of them. 
+
+Let's start off with an example. Consider we are working on an application for a bank. This is what it could look like after our first iteration. 
+
+
+
+```java 
+
+public class BankAccount {
+  private long accountNumber;
+  private String owner;
+  private double balance;
+
+  public BankAccount(long accountNumber, String owner, double balance) {
+    this.accountNumber = accountNumber;
+    this.owner = owner;
+    this.balance = balance;
+  }
+
+  // .. getters and setters for all the fields
+
+}
+
+```
+
+
+
+We can easily instantiate our simple bank account like so: 
+
+
+
+```java 
+BankAccount newAccount = new BankAccount(980L, "Kara", 2000.00);
+```
+
+
+
+But, as always, new requirements come in and we need to beef up our class to take 
+some more arguments. 
+
+
+
+```java 
+
+public class BankAccount {
+  private long accountNumber;
+  private String owner;
+  private double balance;
+  private String branch;
+  private double interestRate;
+
+  public BankAccount(long accountNumber, String branch, String owner, double balance, double interestRate) {
+    this.accountNumber = accountNumber;
+    this.owner = owner;
+    this.balance = balance;
+    this.branch = branch;
+    this.interestRate = interestRate;
+  }
+
+  // .. getters and setters for all of the fields 
+}
+
+```
+
+
+
+Not so bad.. we could instantiate a new bank account again, like so: 
+
+
+
+```java 
+BankAccount account1 = new BankAccount(809L, "Chicago", "Roger Waters", 2000.00, 4.3);
+BankAccount account2 = new BankAccount(740L, "Kurt Vile", "Seattle", 3.4, 5000.00);
+```
+
+
+
+Sure, this example might be a tad extreme because we don't have that many constructor
+arguments but there's enough. When you have multiple consecutive arguments of the same
+type it can be easy to accidentally swap them around and the compiler would never catch this type of error. And we know that even more parameters will eventually be 
+added to this constructor so we can use the builder pattern to alleviate some of this 
+pain. 
+
+
+
+```java 
+public class BankAccount {
+  private long accountNumber;
+  private String owner;
+  private double balance;
+  private String branch;
+  private double interestRate;
+
+  private BankAccount(long accountNumber, String branch, String owner, double balance, double interestRate) {
+    this.accountNumber = accountNumber;
+    this.owner = owner;
+    this.balance = balance;
+    this.branch = branch;
+    this.interestRate = interestRate;
+  }
+
+  //..  getters and other methods
+
+  public static class Builder {
+    private long accountNumber;
+    private String owner;
+    private double balance;
+    private String branch;
+    private double interestRate;
+
+    public Builder setAccountNumber(long accountNumber) {
+      this.accountNumber = accountNumber;
+      return this;
+    }
+
+    public Builder setOwner(String owner) {
+      this.owner = owner;
+      return this;
+    }
+
+    public Builder setBalance(double balance) {
+      this.balance = balance;
+      return this;
+    }
+
+    public Builder setBranch(String branch) {
+      this.branch = branch;
+      return this;
+    }
+
+    public Builder setInterestrate(double interestRate) {
+      this.interestRate = interestRate;
+      return this;
+    }
+
+    public BankAccount build() {
+      return new BankAccount(accountNumber, branch, owner, balance, interestRate);
+    }
+  }
+}
+
+```
+
+
+
+I'll note that you don't have to make your Builder class nested, it's just a common
+convention. You could make it a standalone class and it'll do just the same. 
+
+We can then create new `BankAccount` objects like so: 
+
+
+
+```java
+BankAccount account = new BankAccount.Builder().
+                                      .setAccountNumber(804L)
+                                      .setOWner("Joe Schmo")
+                                      .setInterestRate(3.2)
+                                      .setBranch("Somewhere")
+                                      .setBalance(1000.00)
+                                      .build();
+
+```
+
+
+
+
+You may be thinking.. but we **still** had to remember the order of arguments within
+the builder class. Yes, that's true but only once. After we create the builder, we 
+no longer need to remember the order of arguments because that is encapsulated within
+the `build()` method of the builder. One of the other great advantages is that
+it's easy to see what each value represents when we use a builder to create objects. 
+One could argue it's too verbose and while that may be true I'd argue that the clarity it brings to the code out weighs verbosity. 
+
+
+To keep the theme rolling, stay tuned for a post on the factory method pattern.
+
+

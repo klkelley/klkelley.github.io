@@ -1,0 +1,209 @@
+---
+layout: post
+comments: true
+title: Jetty Server and HTTP Libraries
+date: 2018-05-03 13:00:00
+description: Reading through large code bases 
+---
+
+
+The purpose of this post is to review the Eclipse Jetty Web Server library. Specifically, we'll 
+be discussing the `Server` and `Http` packages but I'll also give a high level overview of the library. 
+
+First off, Jetty provides an HTTP server and Servlet container that's capable of serving static
+and dynamic content. It also supports HTTP/2 among other components and integrations. 
+
+<br>
+
+### Server and HTTP package structure
+<br>
+
+The `http` package contains tools for Http processing. It contains classes like `HttpStatus`, `HttpParser`, `HttpURI`, `MimeTypes`, `HttpField`, etc. It contains one sub-package called `pathmap`
+which is primarily used by the `jetty.servlet` package to map paths to resources. It is not used
+by the `server` package. 
+
+The `server` package contains four sub-packages: `session`, `handler`, `jmx` and `nio`. 
+The `jmx` package contains Java Management Extension (JMX) integrations. The `nio` package contains 
+one class however it is deprecated. The `handler` package contains the various handler classes which we will discuss later. Lastly, the `session` package allow for requests to store and retrieve
+information across the time a user spends in an application. The rest of the `server` package contains classes that form the Server API which we'll talk about in more detail. 
+
+
+<br>
+
+
+### Key players 
+<br> 
+
+We'll start off by talking about the key components in the `Server` package and along the
+way we will discuss the `Http` package and how it is used by the `Server`. I will prefix classes with their respective package name to avoid any confusion. It should also be noted that the `server`
+package has a decent amount of reliance on the `jetty.io`, and `jetty.util` packages for managing
+threads and callbacks however they will not be discussed in detail as its beyond the scope of this 
+post. In addition, it relies occasionally on the `jetty.servlet` and `javax.servlet` packages as well. 
+
+
+Not surprisingly, the biggest key player in the `Server` package is the `server.Server` class. 
+When you instantiate a `server.Server` object it then instantiates a `server.ServerConnector` which
+then instantiates a `server.HttpConnectionFactory` and in turn a `server.HttpConfiguration` object is created. This all happens before a request is even received. The `server.HttpConnectionFactory` is responsible for creating new `http.HttpConnection` objects for each request (more on that later). 
+
+The `server` object forms the HTTP request receivers (i.e. `Connectors`) and request handlers. The server itself is also a `handler` as it implements the `HandlerWrapper` interface
+ 
+I won't talk much in detail about `Connectors` or `ServerConnectors` but know that `Connectors` use `ThreadPool` methods to run jobs. `ServerConnectors` are an implementation of `Connectors` which is the primary connector for the Jetty server over TCP/IP and it uses the `ExecutorServer` to execute tasks asynchronously. 
+
+<!--
+HttpConnection.run
+calls... 
+connection.onFillable calls channel.handle() which then ends up calling getServer.handle(this)
+and the iterating begins...  -->
+
+
+A Jetty `server` object can only have one `handler` (I'll discuss this further). With that said, the various types of `handlers` available for use in the `server.handlers` package is substantial so I'll talk about a few of the important components here because its pertinent information when setting up a Jetty `server` object. 
+
+
+The main `server` package contains a `Handler` interface which is implemented by `AbstractHandler`
+and `AbstractHandlerContainer`. The remaining handlers extend either the `AbstractHandler` or 
+`AbstractHandlerContainer` and both of these class implement some convenience methods. A few key players in regards to handlers include the `HandlerWrapper` which acts as a `handler` but delegates
+the `Handler#handle` methods (primarily used to implement the Decorator pattern). `HandlerCollection` is a collection of handlers. It's default implementation is to call all handlers in list order, regardless of the response status or exceptions. Lastly, I'll talk about `ContextHandler` and `ContextHandlerCollection`. `ContextHandler` takes a context (i.e. path) upon instantiation and then you set the corresponding handler to that path (see below for an example). Not surprisingly, the `ContextHandlerCollection` creates a map of context to its contained handlers based on the context path. Put simply, its a collection of handlers and their associated path. 
+
+
+Another important handler to mention is the `ResourceHandler` which serves static content. It relies heavily on the `jetty.util.resource` package which concerns its self for all things file related (i.e. retrieving files). 
+
+
+<!-- response.getWriter() gives a PrintWriter which is the parent class of ResponseWriter
+in your handler class then you `write` out the response  and then set baseRequest.setHandled(true)
+which means the request is handled and you dont need to keep iterating through the handlers to see
+who should respond to the request 
+ -->
+
+<br>
+
+### Jetty Request/Response cycle 
+<br> 
+
+
+So, now that we have some context regarding the key players in the `server` package let's discuss
+the request/response cycle using Jetty. We'll talk about some of the key components of the `http` package along the way as well. For the purposes of this 
+example we'll say our server is configured as follows:
+
+
+```java 
+public someClass {
+  public static void main( String[] args ) throws Exception {
+    Server server = new Server(8080);
+
+    ContextHandler context = new ContextHandler("/");
+    context.setContextPath("/");
+    context.setHandler(new HelloHandler("Root Hello"));
+
+    ContextHandler contextFR = new ContextHandler("/fr");
+    contextFR.setHandler(new HelloHandler("Bonjoir"));
+
+
+    ContextHandlerCollection contexts = new ContextHandlerCollection();
+    contexts.setHandlers(new Handler[] { context, contextFR});
+
+    server.setHandler(contexts);
+
+    server.start();
+    server.join();
+  }
+}
+
+
+public class HelloHandler extends AbstractHandler {
+    final String greeting;
+    final String body;
+
+    public HelloHandler() {
+      this("Hello World");
+    }
+
+    public HelloHandler(String greeting) {
+      this(greeting, null);
+    }
+
+    public HelloHandler(String greeting, String body) {
+      this.greeting = greeting;
+    }
+
+    @Override
+    public void handle(String target,
+                        Request baseRequest,
+                        HttpServletRequest request,
+                        HttpServletResponse response) throws IOException,
+                                                      ServletException
+    {
+      response.setContentType("text/html; charset=utf-8");
+      response.setStatus(HttpServletResponse.SC_OK);
+
+      PrintWriter out = response.getWriter();
+
+      out.println("<h1>" + greeting + "</h1>");
+      if (body != null) {
+        out.println(body);
+      }
+
+      baseRequest.setHandled(true);
+    }
+}
+
+```
+
+<!-- Once a request is received (and every request thereafter) a new `server.HttpConnection` object is created.
+This object creates a new `http.HttpGenerator` and a `server.HttpChannelOverHttp` object. The
+`server.HttpChannelOverHttp` object then creates a new `server.Request`, `server.Response`, 
+`http.HttpUri`, and a `http.HttpParser`. All of these objects are created on each request to avoid
+sharing state between requests which is especially important when hundreds of requests could be received at the same time.  -->
+
+When a request is received, the Jetty server relies on the `Jetty.io` package to create
+new `SocketChannels` from the `java.nio` library which then asks the `ServerConnector` to create
+a new connection. `ServerConnector` then relies on the `server.HttpConnectionFactory` to create
+a new `server.HttpConnection` object.This object creates a new `http.HttpGenerator` and a 
+`server.HttpChannelOverHttp` object. The `server.HttpChannelOverHttp` object then creates a new 
+`server.Request`, `server.Response` (starts off as a 200 OK response), `http.HttpUri`, and a 
+`http.HttpParser`; all of these objects aside from `HttpUri` are created via a call to its parent class `HttpChannel`. These objects are created on each request to avoid sharing state between requests which is especially important when hundreds of requests could be received at the same time.
+
+
+Once all of those objects are created, the new `server.HttpConnection` is configured by setting the input buffer size. Now that we have a brand new connection, `server.HttpConnection` makes a call to the `http.HttpParser` to read and parse the request. While it parses the `request` it sets the request object attributes such as the http method, path, protocol, etc.  
+
+
+Once the request is parsed `server.HttpConnection` makes a call to the `server.HttpChannel` to handle the request and it passes along the requested resource, the request, and response which then asks the 
+`server` to handle the request. `server.HttpConnection` and `server.HttpChannel` seem to work very close together and are both important components in the response/request life cycle. 
+
+It is also important to note at this point that the `request` object has a `isHandled()` method which checks to see if the request has been handled by a `handler`. The `server` (which is a subclass of `server.HandlerWrapper`) contains a `server.ContextHandlerCollection` then asks the 
+`server.ContextHandlerCollection` object to handle the request. 
+
+Until the request `isHandled()` evaluates to `true`, the `server.ContextHandlerCollection` contains
+a data structure that has each target (requested source) mapped to a specific handler. It will then iterate through the data structure to find the best match (i.e. which handler should respond to this request based on the path). _note: Remember that for each iteration, the requested resource, request, and response objects are passed as method parameters._ 
+
+Once the appropriate handler is identified, it's the handler's job to set the the `response` status code, content-type, etc and it will then call `request.setHandled(true)`. 
+
+Now that the request has been handled, `server.HttpChannel` asks the `http.HttpGenerator` (a class dedicated to constructing HTTP message) to generate a response (you could think of it as a response builder/formatter). 
+`server.HttpChannel` then takes the response data and writes it to a buffer which ends the response/request cycle. 
+
+
+
+### Compare & Contrast
+<br>
+
+The last part of this post will be focused on comparing and contrasting these implementations against how I implemented my HTTP server. The Jetty `server` and `http` libraries do contain
+more functionality than I implemented so what I'm focused on are the differences in abstractions not necessarily complexity. 
+
+
+First off, as you can see in our example above, the server along with all associated handlers and routes are configured in `Main` (if you were to use these libraries). I thought this was especially
+helpful because this is typically the first place you'd visit in a codebase. Seeing all the different routes, handlers, etc gives you plenty of context about what type of routes are available. In my implementation, the routes and handlers were defined in a separate class called `Application` which was instantiated inside `Main` meaning that it wasn't abundantly clear what routes were being defined or where. In both implementations, the server is configured with a single `Handler` which delegates to another handler to find an appropriate handler to respond to a request. 
+
+
+The different types of collection based handlers, specifically the `ContextCollectionHandler` seemed similar to my implementation of the `Router` in that it matches a handler based on the target path. With that said, Jetty, unsurprisingly, offers more types of collection based handlers based on your needs while my implementation is not as flexible. 
+
+One of they key differences I noticed in regards to `Response` objects is they had the ability to send a redirect (i.e. response.sendRedirect(location)) and error related responses (i.e. `400 Bad Request`). In comparison, I had a handler dedicated to redirects but the implementation was a bit contrived as it was only routed to `/redirectme`. If I were to continue with this project, I like the idea of asking the response to redirect. 
+
+One difference I noticed was that `Response` and `Request` objects are created in the very beginning, specifically, a `200 OK` response is always created and passed around until it is handled. If the resource isn't found it will eventually make its way to the `DefaultHandler` responsible for sending `404 Not Found` responses. In contrast, in my implementation, `Request` objects were only created after being validated (while being parsed) and a `Response` object was 
+created only once it was matched with a handler. I think there are pros and cons to each approach. With my implementation, `Response` objects are created in multiple places (each handler) while in Jetty's approach, a `Response` is created in one place (`HttpConnection`) and passed around until it's handled. 
+
+
+One glaring difference I noticed was the implementation of retrieving resources. The `server` package contains a `ResourceService`  (relied on by `ResourceHandler`) which relies on a `ResourceContentFactory` which relies on the `jetty.util.resource` package. This packages is responsible for retrieving and creating resources. While the implementation is similar, the abstraction is different from mine in that the `resource` package is completely separate from the `server` package. 
+
+
+In regards to overall design, most of the Jetty classes in the `server` package are subclasses, many of which also implement multiple interfaces. In comparison, I had very little inheritance aside from sub-classing different response types. In some cases, classes that were subclasses were also parent classes. With the high usage of inheritance and implementation of multiple interfaces it made things hard to follow and understand the true purpose of each class.
+
+

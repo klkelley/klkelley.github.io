@@ -1,0 +1,103 @@
+---
+layout: post
+comments: true
+title: Threading Macros
+date: 2018-02-15 10:30:00
+description: What are they and how to use them in Clojure
+---
+
+
+It's not even been a week since I've been programming in Clojure and I kept seeing these funny looking arrows `->` 
+in blogs and on StackOverflow. I had a sense in how they worked and decided to use them in my first feature because
+I thought they made the code easier to read. 
+
+Come to find out, they are called threading macros. You don't have to use them but they seem to express more clearly
+what you are attemping to do with your data structure. They are a way to convert nested functions into a linear flow
+of function calls. 
+
+The term *thread* in this context means to pass a value through a pipeline of functions and is not related to the concept of concurrent threads of execution. Just wanted to get that out there. 
+
+
+Say we have a nested data structure like so: 
+
+
+
+```clojure 
+(def fake-data
+  {:name "Kara Kelley"
+   :address {:street "123 nowhere street"
+             :city "Chicago"
+             :state "Illinois"
+             :zip 123456}
+    :employer {:name "A place somewhere"
+              :address {:street "12345 nowhere avenue"
+              :city "Chicago"
+              :state "Illinois"
+              :zip 123456}}})
+
+```
+
+
+
+We could get some data like what state the employer is located by doing something like this: 
+
+
+
+```clojure
+(:city (:address (:employer fake-data)))
+; Chicago
+```
+
+
+
+You have to start from the inside and work your way to the outside while trying to keep some context of where you started. It's not terrible but it's not super easy to read and we could improve it using thread macros. Let's give that a try. 
+
+
+
+```clojure
+(-> person
+    :employer
+    :address
+    :city)
+
+; Chicago
+```
+
+
+
+I think threading macros is even more helpful when you have a value and need to pass that value to a series of functions. 
+Say we want to perform a calculation and pass the value to each function. 
+
+
+
+```clojure 
+(defn calculate []
+  (reduce + (map #(* % %) (filter odd? (range 10)))))
+; 165
+
+```
+
+
+
+So, if we start from the inside we want a range of 10 numbers, get all the odd numbers, multiply each number by itself, then add them all up. We can follow it but we can do better! 
+
+
+
+
+```clojure
+(defn calculate []
+  (->> (range 10)
+       (filter odd?)
+       (map #(* % %))
+       (reduce +)))
+```
+
+
+
+That's much easier read! So with each step in the pipeline, it takes the result from the previous step as its argument. While they look like function calls with no arguments, starting with the second expression, they in fact all are given one argument which is the result of previously evaluated expression. 
+
+It's also important to note that in each of these two examples I used two different arrows. The first 
+`->` is a thread-first macro and `->>` is a thread-last macro. What's the difference? 
+
+
+With thread-first macros, the threaded argument is inserted in the first position of the argument list. With thread-last macros, the argument is inserted in the last position of the argument list. I wish I had known this 48 hours ago when I couldn't figure out *why* my arguments were getting out of order. What I actually needed was a thread-last macro instead of a thread-first macro. Well, at least now I know. So, `->` and `->>` do the same thing but they differ in where the threaded argument is placed in the argument list of the functions. 

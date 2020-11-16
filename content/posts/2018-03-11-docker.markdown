@@ -1,0 +1,212 @@
+---
+layout: post
+comments: true
+title: Docker Basics
+date: 2018-03-11 14:20:00
+description: An Intro to Docker
+---
+
+
+This week I am giving a presentation on Docker and thought it would be helpful to flesh out my thoughts and understanding of Docker on my blog as well. 
+
+I think the hardest part about learning Docker as a newer developer is understanding why Docker 
+is so popular to begin with. I've find that most tutorials assume you've had several years of 
+experience in software development and have alot of base knowledge. I've never (at least not yet) had to experience the pains of what it takes to deploy a production-ready application to a server. I've also never used or worked with system virtual machines so my learning curve has been rather
+steep. 
+
+
+## What is docker? 
+<br>
+
+Docker is a new open-source container technology that makes it possible to get far more apps
+running on the same old servers and it also makes packaging and shipping programs very easy. 
+I like to think of it as a tool for bundling up an application an its dependencies in a self-contained unit that's capable of running anywhere. Literally, anywhere. 
+
+Many people say that Docker solves the problem of "well, it worked on my machine!"
+
+## Virtual Machines & Containers
+<br> 
+
+I think the first step in understanding why Docker even exists is to understand traditional virtualization. But first, what are "containers" and "VMs"? 
+
+They both are similar in their goals which is to isolate an application and its dependencies
+into a self-contained unit that can run anywhere. They both remove the need for physical hardware, which allows for more efficient use of computer resources. Where they differ is in
+their architectural approach. 
+
+_NOTE: The purpose of this post is not to discuss if one is better than the other or when you should use VMs over containers. This is purely information and I think the trade-offs alone is beyond the scope of this post._ 
+
+### Virtual Machines 
+<br> 
+
+
+A virtual machine is basically an emulation of a real computer. VMs run on top of a physical
+machine using a hypervisor. A hypervisor, in turn, runs on either a host machine or on bare metal. 
+
+A hypervisor is a piece of software, firmware, or hardware the VMs run on top of. Hypervisors
+run on physical computers, referred to as "host machines". The host machine provides the VMs
+with resources including CPU and RAM. All of these resources are divided up between VMs and
+can be allocated as you see fit. If you have one VM that is running a more resource heavy application, you can allocate more resources to that VM than other other VMs running on the same host machine. 
+
+A VM that is running on the host machine (using a hypervisor) is also often referred to as a "guest machine". Although VMs run in complete isolation from their host, there's alot of overhead. The host operating system has to power the hypervisor and it's guest OS just to run
+an application. 
+
+The guest machine contains both the application and everything it needs to run the application. In addition, it also carries an entire virtualized hardware stack of its own. 
+
+Here's a diagram that illustrates much of what I've just said. VMs package up the virtual hardware, an OS, and user space for each new vm. 
+
+
+![vm](https://cdn-images-1.medium.com/max/1600/1*RKPXdVaqHRzmQ5RPBH_d-g.png)
+
+
+### Containers
+<br> 
+
+In contrast to VMs which provide hardware virtualization, containers provide operating-system
+level virtualization by abstracting the user space. Containers look like VMs in the sense that
+they are isolated, can execute commands as root, have a private network interface, etc. 
+
+As you can see by this diagram, the biggest difference between the two is that containers
+**share** the host system's kernel with other containers. You can also see, by not packaging up
+the kernel or virtual hardware for each container like VMs, containers are inherently more lightweight. 
+
+
+![containers](https://cdn-images-1.medium.com/max/1600/1*V5N9gJdnToIrgAgVJTtl_w.png)
+
+<br>
+<br>
+
+## So, Why is Docker so Popular? 
+<br>
+
+I figured containers were new and introduced by Docker but that's not the case. Container
+technolgoy has been around for several years. If containers have been around for a while, why 
+is Docker so popular? 
+
+
+### Easy to Use
+<br>
+
+Docker makes it much easier for developers, system admins, and others to use containers in order
+to build and test applications. This means anyone can package up an application on their laptop which can then be run on any public or private cloud. Docker's mantra after all is, "build once, run anywhere". I can atest to this as someone who's never used Docker until last week. I won't say it was super easy as a beginner but within a few days I was able to package up my Java application, build, and push docker images to Docker Hub. Now anyone can pull my images and run my application. There's no need to download any dependencies or worry about conflicts. 
+
+### Speed 
+<br>
+
+Within seconds you can create and run a docker container on your laptop. Containers are just 
+sandboxed environments running on the kernel compared to VMs which have to boot up a full virtual OS every time. 
+
+### Docker Hub
+<br>
+
+Someone referred to Docker Hub as the "app store for Docker images" and I think that's pretty spot on (You also know by now how much I love analogies). There are thousands upon thousands of public images available for use. Docker Hub makes it easy to find images and publish your own images as well. 
+
+### Modularity and Scalability 
+<br>
+
+While I haven't used this functionality, Docker makes it easy to break up your application's
+functionality into individual containers. You could have your PostgreSQL database in one container with your Rails app in another. Docker allows you to easily link these two containers together to create your application. This makes it easy to scale or update components at any time. 
+
+<br>
+<br>
+
+## Docker Concepts 
+<br>
+
+### Docker Engine
+<br>
+
+The Docker engine is the layer that Docker runs on. It's a lightweight runtime and tooling
+that manages containers, images, builds, etc. It runs natively on Linux systems and is made up of: 
+
+* A Docker Daemon that runs on the host computer
+* A Docker client that then communicates the with Docker daemon to execute commands 
+* A REST API for interacting with the Docker daemon remotely 
+
+
+### Docker Client 
+<br> 
+
+The Docker client is what the end-user of Docker communicates with. You can think of it as the 
+UI for Docker. An example of communicating with the Docker client would be when you run 
+`docker build klkelley/my-image`. 
+
+
+### Docker Daemon
+<br> 
+
+The Docker daemon is what executes the commands sent to the Docker client like building, running, and distributing containers. It runs on the host machine but as a user you never
+actually communicate directly with the daemon; that's all done through the Docker client. 
+
+
+### Dockerfile
+<br> 
+
+The Dockerfile is where you write instructions to build a Docker image. You can think of it
+as a recipe for creating a new Docker image. 
+
+Here is what my Dockerfile looks like for my HTTP Server which is a rather basic Dockerfile. 
+
+
+
+```docker 
+FROM openjdk:8-jre-alpine
+LABEL maintainer=email@company.com
+COPY libs/http-server.jar libs/http-server.jar
+ENTRYPOINT ["java", "-jar", "libs/http-server.jar"]
+EXPOSE 8080
+RUN apk --update --no-cache add curl
+HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
+
+```
+
+* **FROM** - the image the new image will be based upon. All Dockerfiles must start with a **FROM** instruction. 
+* **LABEL** - Adds metadata to an image - in this case we are adding maintainer metadata
+* **COPY** - Copy a file or a directory into the image. In this case we are copying a JAR file which will then be used as our entrypoint
+* **RUN** - Run a command inside the container 
+* **EXPOSE** - Informs Docker that the container listens on the specified network ports at runtime. It does not actually publish the port but this instruction functions as a type of documentation between the person who builds the image and the person who runs the container about which ports are intended to be published. 
+* **ENTRYPOINT** - Allows you to configure a container that will run as an executable 
+* **HEALTHCHECK** - Tells Docker to test a container to check that it is still working. This can detect cases such as a web server that is stuck in an infinite loop and is unable to handle new connections. 
+
+
+### Docker Images
+<br> 
+
+Images are read-only templates that you build from a set of instructions written in your Dockerfile. Images define what you want your packaged application and its dependencies to look like and what processes to run when it's launched. Each instruction of the Dockerfile adds a new
+"layer" to the images, with layers representing a portion of the images file system that either
+adds to or replaces the layer below it. 
+
+
+### Docker Containers
+<br> 
+
+A Docker container wraps an application's software into a box with everything the application
+needs to run. It can include the operating system, source code, system tools, etc. Docker containers are built off Docker images. Since images are read-only, Docker adds a read-write
+file system over the read-only file system of the image to create a container. 
+
+![container](https://cdn-images-1.medium.com/max/1600/1*hZgRPWerZVbaGT8jJiJZVQ.png)
+
+
+
+### Docker Workflow 
+<br> 
+
+
+Here is a basic diagram that illustrates an example of a Docker workflow that also happens
+to closely resemble the workflow that I have set up now (minue the deployment for now). 
+
+You can use CI/CD services, like TravisCI, for example to build and push your docker image to Docker Hub upon a successful build. This also allows you to use container images as build artifacts which can live on Docker Hub forever (or as long as necessary). You can run those same images in production but if something goes wrong you can easily roll back to a previous image. 
+
+
+![workflow-docker](https://i.pinimg.com/originals/32/aa/f8/32aaf859474c7f20e94a21dc067e363f.jpg)
+
+
+<br>
+<br>
+
+This was a rather high-level overview of Docker and I only scratched the surface. There is alot
+more to Docker but I think this is a great starting point for someone wanting to know more about
+Docker or someone who wants to give it a try. 
+
+Docker also offers an interactive [self-paced training program](https://training.play-with-docker.com/dev-landing/) that is rather in-depth if you are interested in learning more. As always, the [Docker Docs](https://docs.docker.com/) are also a great place to start. 
+
+

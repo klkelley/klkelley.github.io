@@ -1,0 +1,43 @@
+---
+layout: post
+comments: true
+title: Git & Github
+date: 2017-06-26 19:30:00
+description: Getting to know git
+---
+
+Week 1 at DBC was spent getting to know the command line better along with proper git and Github workflow.
+
+I've used git and Github for almost a year now. I knew how to initialize a repo and push my code to the master branch. That was about it. I knew there was more to it but I did not understand git's true purpose and why version control is great when working in teams. Better yet, I learned about branching which was also foreign to me.
+
+**What is git?**
+
+Simply, git is a version control software used to track the changes of files and merge revisions made by different people. There are other version control software out there but I'm just going to be talking about git in this post.
+
+**Why use it?**
+
+In a nutshell, Git takes snapshots of your files at a particular moment in time (initiated by the user of course) and you can go back to a particular version whenever you want. It keeps an entire history of revisions made to your files, available for you to access or use at any time.
+
+The other cool feature I learned about recently is branching. Creating a new branch is like creating a new "workstation" for you to work on a new feature without affecting the clean code base. A branch will contain all the current files of your master and you can begin working on fixing a bug or developing a new feature. If you break something, that's fine because your working independent of the master branch where the working code base lives. Once you've finished fixing the bug or developing that feature, then you can merge it (or issue a pull request if working on a team) back into the master branch.
+
+Once I finally grasped the overall concept of version control, I started realizing how useful git could be in other fields that require collaboration on documents.
+
+**Git vs. Github**
+
+When I first heard of git and Github I remember thinking, "Should I learn git or Github first". At the time, I didn't understand that although they are commonly used together, they are not the same thing. So we know git is a version control software. Github, on the other hand, is an online platform that allows you to share and manage your code. You can use git without ever using Github but when using an online tool like Github it allows you to browse your history of changes, create a backup of your files in the cloud, and it allows you to share you projects with others. There are other online platforms that are similar, like Bit Bucket.
+
+**How to Use Git**
+
+I won't pretend to be an expert on learning git. I've picked up a lot of new git commands thanks to the [git documentation](https://git-scm.com/) and with the help of DBC of course.
+
+Some of the most common command though include:
+
+* `git init` - initializes a local repository on your machine
+* `git add` - prepare file(s) to be committed
+* `git push` - upload local changes to the remote repo (remote meaning Github for example)
+* `git status` - shows the working tree - which files are untracked, modified, or committed
+* `git commit` - creates a save point in git (i.e. a snapshot of your files)
+* `git clone` - downloads a remote repo to your local machine
+* `git checkout`  - switches you to a different branch
+
+Most of these commands take optional flags and some require filenames so definitely check out the documentation link above if your curious to know more.

@@ -1,0 +1,63 @@
+---
+title: Ruby Classes and Objects
+date: 2016-10-01 20:12:00
+description: Explaining Classes, Objects, and Inheritance
+---
+
+I have been making my way through Zed Shaw's 'Learn Ruby the Hard Way' for the past week. The first half of the book was helpful in the way it hit on the basics. However, once I began to learn about classes, objects, inheritance and how they all work together, I had a hard time wrapping my brain around it.
+
+It's taken me longer than I anticipated to begin to understand these concepts that are essential to understanding an object-oriented program like Ruby. The good news is, after a while it began to make sense somehow.
+
+A class is a blueprint for objects. You can have just one class but many instances of that class. For example you have the `class Pet` and objects of that class could include `dogs`, `cat`,`snakes`, etc. and they can inherit the attributes of the `Pet` class. Of course, your objects can have their own unique attributes but we'll save that for another day.
+
+So, an object is an instance of a class. Here's an example creating the `class Pet`  and creating an object (or instance) within the class.
+
+
+
+```ruby
+class Pet
+end
+
+dog = Pet.new
+```
+
+
+
+ We create a new object by calling the class method `new`. In this case, the `dog` is now an object of the class `Pet`.
+
+Let's switch gears and talk about inheritance. It can be helpful when you have multiple classes with the same attributes. For example, all ```Pets``` have a name, gender, and age. So, instead of writing the same code multiple times we can simply inherit attributes from another class.
+
+
+
+```ruby
+class Pet
+  attr_accessor :name, :gender, :age
+end
+
+class Dog < Pet
+end
+
+class Cat < Pet
+end
+```
+
+
+
+The code above is an example where our new classes inherit the attributes defined in the class `Pet`. If we create a new instance of the `Dog` or `Cat` class we can now access these attributes. As an Example:
+
+```ruby
+cat_1 = Cat.new
+cat_1.name = "Kennedy"
+cat_1.gender = "female"
+cat_1.age = 2
+
+puts "The cat is a #{cat_1.age} year old #{cat_1.gender},
+      and it's name is #{cat_1.name}."
+
+# >> The cat is a 2 year old female, and it's name is Kennedy.
+```
+
+
+
+This is a rather basic explanation of Classes, Objects, and Inheritance in regards to Ruby but there's always a starting place. Until next time...
+<br>

@@ -1,0 +1,96 @@
+---
+layout: post
+comments: true
+title: SOLID&#58; Interface Segregation Principle
+date: 2018-01-23 09:45:00
+description: Learning about ISP
+---
+
+The Interface Segregation Principle states:
+> "Clients should not be forced to depend on methods they do not use."
+
+What that means is that your interfaces should not be bloated with methods that implementing classes don't require. Such interfaces are referred to as "fat" interfaces. ISP favors small, specific interfaces so that clients only have to know about the methods that are of interest to them which are often referred to as "role" interfaces.
+
+If a class has to implement a "fat" interface then it is required to provide empty/fake implementations of those methods it doesn't use. Those classes are then subject to change when the interface changes.
+
+Let's take a look at an example that first violates ISP. Our interface defines the common behaviors of Animals.
+
+
+```java
+public interface Animal {
+  public void sleep();
+  public void walk();
+  public void fly();
+  public void eat();
+  // ..
+}
+
+public class Bird implements Animal {
+  //..
+
+  public void walk() {
+    // ..
+  }
+
+  public void fly() {
+    // ..
+  }
+
+  public void eat() {
+    // ..
+  }
+}
+
+public class Tiger implements Animal {
+  // ..
+  public void walk() {
+    // ..
+  }
+
+  public void fly() {
+     // Tigers can't fly
+  }
+
+  public void eat() {
+    // ..
+  }
+}
+
+```
+
+
+We know that many animals have the ability to fly but right now our `Tiger` class
+has to make a fake implementation of the `fly()` method. A `Tiger` doesn't need to know anything about flying behavior. For each type of animal that cannot fly we would have to deal with providing a fake implementation of `fly()`. This is not a good design decision.
+
+Instead, let's pair down our interface so implementing classes only need to know about behavior they will use.
+
+
+
+```java
+public interface Animal {
+  public void sleep();
+  public void eat();
+}
+
+public interface Flyable {
+  public void fly();
+}
+
+public interface Walkable {
+  public void walk();
+}
+
+public class Bird implements Animal, Flyable, Walkable {
+    // ..
+}
+
+public class Tiger implements Animal, Walkable {
+  // ..
+}
+
+```
+
+
+This example may seem contrived but I decided to create a `Walkable` interface because just like not all animals can fly, not all animals can walk. Now `Tiger` and all subsequent non-flyable animals do not need to implement unused behaviors.
+
+It's hard not to notice the Single Responsibility principle shining through a bit here. Both ISP and SRP share the same goal of ensuring small, specific, and highly cohesive modules. If you find that you have a class that is implementing behavior from an interface it doesn't need, it's highly likely you are violating ISP and may need to rethink your implementation. Interfaces belong to clients, not the implementations therefore they should be designed in a way to best suite the clients.

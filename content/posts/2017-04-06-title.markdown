@@ -1,0 +1,91 @@
+---
+layout: post
+comments: true
+title: Puts vs. Return
+date: 2017-04-06 12:25:00
+description: Explaining the difference between puts & return
+---
+When I first began programming it was difficult for me to distinguish the difference between `puts` and `return` and I've come to realize this is common for beginners. By just looking at the words, they may *sound* like they do the same thing but that's not the case.
+
+### puts
+<br>
+
+`puts` is actually a method call in ruby that stands for 'print string'. It is an instance method available through the Kernel Module. The Kernel class is included in the Object class which is the default root of all Ruby objects. So with that said, all Kernel instance methods are globally accessible meaning you can access them anywhere in your Ruby program.
+
+Now that we have a little background on where `puts` comes from and why you can call it anywhere, let's dig into its functionality. `puts` adds a newline to the string it outputs. When we call `puts` we're telling Ruby to print something to the screen.
+
+
+
+~~~ ruby
+puts "Hello World"
+
+# Hello world      # prints the string 'Hello World'
+# => nil           # returns nil
+~~~
+
+
+
+As expected `puts` printed out our string "Hello World" with a newline but what's with `nil`? Since we know `puts` is a method we also need to be aware of the fact that every method call *returns* a value.
+
+When `puts` is called, it's return value will always be `nil`.
+
+### return
+<br>
+
+In order to talk about the keyword `return` in ruby we first need to talk a little bit about **return values** for it to make sense. So as with our example above when we called `puts` on our string it printed our string but returned `nil`. In ruby, every method call is an expression. When we call a method, the method call evaluates to something. That something, is the return value. I'll illustrate this with some examples.
+
+
+
+```ruby
+2 + 2
+# => 4          return value is 4
+```
+
+
+
+```ruby
+def multiply(a, b)
+  a * b
+end
+
+a = 3
+b = 9
+
+multiply(3, 9)
+# => 27       return value is 27
+```
+
+
+
+``` ruby
+arr = [1, 2, 3, 4, 5]
+arr.pop      
+# => 5      return value is 5
+```
+
+
+
+So as we've seen with our examples, when we invoke a method it will return a value. Ruby always returns the evaluated result of the last line of the expression unless an explicit `return` is used before it. This is where our keyword `return` comes into play.
+
+
+
+```ruby
+def add(a, b)
+  return a
+  a + b
+end
+
+first_num = 4
+second_num = 2
+
+add(first_num, second_num)
+# => 4
+```
+
+
+
+Since we used an explicit `return` the method simply returned the value of `a` and did not execute the rest of the code in the method. Had we not used an explicit `return` our method would have returned the result of `a + b` because it is the last expression to be evaluated in the method. Using an explicit return is not required to get a return value from a method unless you want to return an expression that is not the last line of the method.
+
+
+So with all that said, you should know that `puts` will *print* out something to the screen and using the keyword `return` will *return* a value from a method however it is not required to get a return value from a method.
+<br>

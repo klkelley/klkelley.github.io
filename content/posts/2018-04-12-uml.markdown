@@ -1,0 +1,261 @@
+---
+layout: post
+comments: true
+title: Easing into UML 
+date: 2018-04-12 08:23:00
+description: Understanding UML and diving into class diagrams
+---
+
+
+I can't count the amount of times I've come across UML diagrams while
+reading a technical book or blog post. I can only understand very basic, very
+simple diagrams. At this point, I can only make assumptions about what complex diagrams are trying to illustrate. 
+
+A few weeks ago my mentors ask me to create a UML class diagram illustrating my current HTTP server project. I won't say my diagram was syntactically correct, actually
+I'm pretty sure it wasn't. What I'm trying to get at though was how enlightening
+it was to see the relationships between my classes. It really made me think about how
+classes interacted with each other and how many dependencies I truly had. 
+
+A few days later, I realized how much I might be missing out on when reading books
+or even working on my own projects without a better understanding of UML. 
+
+When I began trying to gather some resources on UML basics I quickly realized how 
+expansive UML is. Previously, I thought class diagrams and sequence diagrams were
+what made up UML. 
+
+To be completely honest, UML has frustrated me in the past because I felt that
+I had seen all different types of diagrams and there was no consistency. They all seemed to look syntactically different. It turns out there are **thirteen** different
+types of diagrams! 
+
+So let's talk very briefly about all the different types of UML diagrams there are. After that we'll shift our focus to class diagrams and dive a little deeper. I had intended to write about a handful of them in this post but each diagram could
+easily be a standalone blog post. 
+
+UML (Unified Modeling Language) can be described as a general purpose visual modeling
+language to visualize, specify, construct, and document software systems. 
+
+
+**UML Diagram Classifications**
+
+There are three different classifications: 
+
+1. Behavior diagrams: a type of diagram that depicts behavior features of a system or process. Diagrams that are behavioral include: activity, state, and use case diagrams. 
+
+2. Structural diagrams: Capture static aspects or structure of a system. Diagrams
+that are structural include: class, composite structure, component, deployment, 
+object, and package diagrams. 
+
+3. Interaction diagrams: A subset of behavior diagrams which emphasize object interactions. This includes: communication, interaction overview, sequences, and timing diagrams. 
+
+
+#### **Types of Diagrams** 
+<br/> 
+
+**Activity Diagram**
+
+   Activity diagrams depict high-level business processes, including data flow, or to model the logic of complex logic within a system. 
+
+**Class Diagram** 
+
+   Class diagrams show a collection of static model elements such as classes and types, their contents, and their relationships. 
+
+**Communication Diagram** 
+
+   Communication diagrams are used to show sequenced messages exchanged between objects. 
+   This type of diagram focuses primarily on objects and their relationships. Similar
+   information can be represented using a Sequence Diagram however communication
+   diagrams represent objects and links in a free form. 
+
+**Component Diagram** 
+
+
+Component diagrams depict the components that compose an application, system, or
+enterprise. The components, their interrelationships, interactions, and their
+public interfaces are depicted. 
+
+**Composite Structure Diagram**
+
+   Depicts the internal structure of a class and its interaction points with other 
+   parts of the system. 
+
+**Deployment Diagram** 
+
+   Deployment diagrams are used to represent system hardware and its software. 
+   They help tell us what hardware components exist and what software components run on them.They tend to be primarily used when software is being used, distributed, or deployed over multiple machines with different configurations.  
+
+
+**Interaction Overview Diagram** 
+
+   Interaction diagram tends to be a mixture of activity and sequence diagrams. They 
+   model a sequence of actions and help us simplify complex interactions into simpler
+   occurrences. 
+
+**Object Diagram** 
+
+   Object diagrams depict object and their relationships at a point in time (like a snapshot), typically a special case of either a class diagram or communication diagram. Put simply, this type of diagram can be referred to as a screenshot of the
+   instances in a system and the relationship that exists between them. 
+
+
+**Package Diagram**
+
+   This type of diagram is more self explanatory. It shows how elements are organized
+   into packages as well as the dependencies between packages. 
+
+**Sequence Diagram** 
+
+   A sequence diagram depicts the interaction between objects in a sequential order. 
+   These diagrams help describe how and in what order objects in a system function. 
+
+**State Machine Diagram**
+
+   The state machine diagram describes the state an object or interaction may be in, as well as the transitions between states. 
+
+**Timing Diagram**
+
+   Timing diagrams are a special form of sequence diagrams which are used to 
+   depict the behavior of objects over a time frame.
+
+**Use Case Diagram**
+
+   A use case is basically a diagram representing different scenarios where a system 
+   can be used. Use case diagrams are used to illustrate the functional requirements of the system and its interaction with external agents. 
+
+
+
+### **Digging Into Class Diagrams** 
+<br/>
+
+Class diagrams is the first type of diagram I'd like to focus on because
+this is the type of diagram that I tend to see most often within books and
+blog posts.
+
+
+As we know, class diagrams show how different entities (people, things, data) relate
+to each other; it shows the static structures of a system. 
+
+Since we are focusing on learning UML most of this will be learning syntax. While
+I don't want to go too micro I did want to show the following diagram. I never
+noticed the some of the subtle elements of the class notation. What I'm 
+referring to specifically are the `+`, `-`, and `#` visibility elements next to 
+the attributes and operations.
+
+![class-notation](https://www.tutorialspoint.com/uml/images/notation_class.jpg)
+
+<br/>
+
+#### **Relationships** 
+<br/> 
+
+**Association** 
+
+   Read as "..has a.." association between classes. Drawn as a straight line between the two classes are connected to each other in any way. For example, a bank registers an account can be shown as follows: 
+
+![association](http://shiftmethod.com/images/stories/shiftmethod/publications/objectModeling/UnderstandingUMLClassRelationships/association.gif)
+
+
+**Dependency** 
+
+   In UML, a dependency relationship is a relationship in which one element, the client, uses or depends on another element, the supplier. Martin Fowler states 
+   in [UML Distilled](https://martinfowler.com/books/uml.html) that a "dependency exists between two elements if changes to the
+   definition of one element (the supplier) may cause changes to the other (the 
+   client)". 
+
+![dependency](http://shiftmethod.com/images/stories/shiftmethod/publications/objectModeling/UnderstandingUMLClassRelationships/dependency.gif)
+
+
+   If association and dependency sound similar to one another you're not alone. To quote Martin Fowler again he states, "In code terms, such things
+   such as naming a parameter type and creating an object in a temporary variable imply a dependency. You don't want to show every dependency on a UML diagram - there are far too many. You need to be selective and show only those that are important to whatever you are communicating". He also goes on to state that "Associations also imply dependency, if there is an association between two classes, there is also a dependency."
+
+   So based on that, it sounds like you can use them interchangeably in a way but you should use the dependency relationship when you are trying to communicate something
+   in particular. 
+
+
+**Aggregation** 
+
+   Reads as "..owns a.." and is more specific than association. It indicates that a class
+   is a container or collection of other classes. For example, a "library" is made up of one or more books. In aggregation, the contained classes are not strongly dependent on the lifecycle of the container. So, books will remain even when the library is resolved. To show aggregation in a diagram, draw a line from the parent class to the child class with a hollow diamond shape near the parent class. Like so: 
+
+![aggregation](http://shiftmethod.com/images/stories/shiftmethod/publications/objectModeling/UnderstandingUMLClassRelationships/aggregation.gif)<br>
+
+_Per the example, A1 would be the library and B1 would be books_
+
+
+**Composition** 
+
+Reads as "..is part of..". The composition relationship is similar to aggregation with the main difference being its key purpose of emphasizing that dependence of the contains class to the lifecycle of the container class. In other words, the contained class will be destroyed when the container class is destroyed. For example, the straps
+of a backpack will cease to exist once the backpack is destroyed. To show 
+composition relationship in UML, it is the same as aggregation but the diamond shape is filled. 
+
+![composition](http://shiftmethod.com/images/stories/shiftmethod/publications/objectModeling/UnderstandingUMLClassRelationships/composition.gif)
+
+
+**Generalization/Inheritance** 
+
+Reads as "..is a.." and is used to express inheritance. To show inheritance
+in UML, a solid line from the child class to the parent class is drawn using
+an unfilled arrowhead. Considering the diagram below we can say that `B2` is the
+super class and `A2` is the subclass.  
+
+![generalization](http://shiftmethod.com/images/stories/shiftmethod/publications/objectModeling/UnderstandingUMLClassRelationships/generalization.gif)
+
+
+**Realization**
+
+Realization represents the implementation of an interface by a class. It
+represents how some of the characteristics of a class are defined but says nothing
+about implementation details. If you take a look at this diagram is illustrates
+that `A3` implements `B3` 
+
+![realization](http://shiftmethod.com/images/stories/shiftmethod/publications/objectModeling/UnderstandingUMLClassRelationships/realization.gif)
+
+
+**Multiplicity**   
+
+Now that we have our bearings with the common relationships let's talk a little
+bit about multiplicity. More than likely, you've seen the little numbers next to the relationships before, like so: 
+
+![multiplicity](https://www.ibm.com/developerworks/rational/library/content/RationalEdge/sep04/bell/bell_fig6.jpg) 
+
+
+So does the addition of multiplicity illustrate? The value `0..1` next to `Plane` means that when an instance of `Flight` exists, it can have either one instance of a plane associated with it or no plane associated. It also says that the `Plane` instance can be associated with either none or up to an unlimited number of flights. 
+
+
+Here are some common multiplicity values along with their meanings: 
+
+<table style="border: 1px solid black; border-collapse: collapse;">
+  <thead style="border: 1px solid black">
+    <th style="width: 180px" rowspan="1" colspan="1">Value</th>
+    <th style="width: 180px" rowspan="1" colspan="1">Meaning</th>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid black">
+      <td style="text-align: center">0..1</td>
+      <td style="text-align: center">Zero or one</td>
+    </tr>
+    <tr style="border-bottom: 1px solid black">
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">One Only</td>
+    </tr>
+    <tr style="border-bottom: 1px solid black">
+      <td style="text-align: center">0..*</td>
+      <td style="text-align: center">Zero or more</td>
+    </tr>
+    <tr style="border-bottom: 1px solid black">
+      <td style="text-align: center">*</td>
+      <td style="text-align: center">Zero or more</td>
+    </tr>
+      <tr style="border-bottom: 1px solid black">
+      <td style="text-align: center">1..*</td>
+      <td style="text-align: center">One or more</td>
+    </tr>
+    <tr style="border-bottom: 1px solid black">
+      <td style="text-align: center">5..15</td>
+      <td style="text-align: center">Five to fifteen</td>
+    </tr>
+  </tbody>
+</table>
+
+<br/>
+
+I think that's a wrap for an introduction into UML, specifically class diagrams. There
+is still much to learn about considering we didn't really cover any of the other 12 diagrams but I think having a basic understanding of what encompasses UML as a whole and intermediate knowledge of class diagrams is a good start. 
+
