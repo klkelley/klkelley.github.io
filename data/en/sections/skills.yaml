@@ -14,4 +14,14 @@ skills:
 - name: Elixir
   icon: "/images/icons/elixir.jpg"
   summary: "This website is under construction!"
-  url: "https://kubernetes.io/"
+  url: "https://elixir-lang.org/"
+
+- name: Scala
+  icon: "/images/icons/scala.png"
+  summary: "This website is under construction!"
+  url: "https://www.scala-lang.org/"
+
+- name: Phoenix Framework
+  icon: "/images/icons/phoenix.png"
+  summary: "This website is under construction!"
+  url: "https://www.phoenixframework.org/"
