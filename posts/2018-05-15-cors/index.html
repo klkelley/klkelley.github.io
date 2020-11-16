@@ -1,0 +1,44 @@
+<!doctype html><html><head><title>CORS</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="What is CORS?"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>May 15, 2018</p></div><div class=title><h1>CORS</h1></div><div class=post-content id=post-content><p>This week I came across my first CORS error. I was trying to make an HTTP
+request from my React app to my TicTacToe API; both apps are deployed on
+different domains.</p><p>Previously, I had made countless requests to my API using Postman, Netcat,
+Telnet, etc. so why all of a sudden am I getting these weird CORS errors?</p><p>First, it&rsquo;s important to know about same-origin policy which is a security
+measure implemented by web browsers. It&rsquo;s goal is to prevent JavaScript code
+from making requests against a different origin (i.e. a different domain)
+than the one from which its served. Why? Consider that you logged into your
+favorite social media site, lets say Twitter, and in a new tab you visit a
+malicious website. Without same-origin policy, the JavaScript on the
+malicious website could essentially pretend to be you. It could post new
+Tweets, access your account settings, etc. With same-origin policy, the
+browser can detect if the JavaScript is trusted to access
+Twitter&rsquo;s resources. It detects this by checking if the JavaScript is included
+from an HTML page on twitter.com.</p><p>It should be noted as well that this policy only applies to executing
+JavaScript. Browsers don&rsquo;t enforce the same security measures when loading resources
+such as images, stylesheets, videos, etc.</p><p>So, what if you have an application at the domain <code>http://www.somesite.com/</code> that
+needs to make legitimate requests to <code>http://www.othersite.com/</code>? Same-origin
+policy&rsquo;s strictness would forbid this. Which finally brings us to CORS.</p><p>CORS is an acronym for Cross-Origin Resource Sharing; it serves to relax the
+same-origin policy, allowing JavaScript on a web page to consume an API served
+from a different origin. Any request for a resource outside of the origin is
+known as a cross-origin request and CORS manages these cross-origin requests.</p><p>Servers must implement ways to handle these requests from outside origins. In
+other words, servers needs to specify who (which origins) can access assets
+on the server. In order to inform the browser who is allowed to access these assets
+the server must respond with an <code>Access-Control-Allow-Origin</code> header that matches
+the origin of the request. For example:</p><pre><code>Access-Control-Allow-Origin: http://www.othersite.com/
+</code></pre><p>You can also set this particular header to <code>*</code> which means that the resource
+can be accessed by any domain; it&rsquo;s definitely the least restrictive.</p><p>Another aspect I&rsquo;d like to touch on briefly are CORS preflight requests. These
+requests are CORS requests that send an <code>OPTIONS</code> request to make sure the actual
+request is safe to send. Preflight requests will be sent if the request method is:
+<code>PUT</code>, <code>DELETE</code>, <code>CONNECT</code>, <code>OPTIONS</code>, <code>TRACE</code>, or <code>PATCH</code>. In addition, regardless
+of the http method, if the <code>content-type</code> of the request
+is anything other than <code>text/plain</code>, <code>multipart/form-data</code>,
+or <code>application/x-www-form-urlencoded</code> a preflight request will be sent as well.
+In my case, I am sending JSON therefore preflight requests are always sent.</p><p>In summary, same-origin policy and cross-origin resource sharing are enforced
+by the browser itself. If you&rsquo;re making API calls via Postman you won&rsquo;t come across
+any CORS issues so that is something to keep in mind. Also be sure your server
+knows how to handle <code>OPTIONS</code> requests for those preflight requests from CORS.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-05-15-cors.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-05-21-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Boundaries</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-05-07-decorator/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Decorator Pattern</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

@@ -1,0 +1,81 @@
+<!doctype html><html><head><title>Package Principles</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Package Principles Applied"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>March 28, 2018</p></div><div class=title><h1>Package Principles</h1></div><div class=post-content id=post-content><p>This post will be focused on how my current HTTP server project either adheres or violates
+certain package principles. I will discuss all the principles including their definitions
+and compare my current project&rsquo;s package structure.</p><blockquote><p>Package principles are a way of organizing classes in larger systems to make them more organized and manageable. They help to understand which classes should go into which packages (i.e. cohesion) and how these packages should relate with one another (i.e. coupling).</p></blockquote><p>At the time of this writing, here is the structure of my current project:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>└── karakelley
+    └── http
+        ├── ContentGeneration
+        │   ├── ContentGenerator.java
+        │   └── HtmlGenerator.java
+        ├── FileSystem
+        │   ├── FileFinder.java
+        │   ├── FileFinderCache.java
+        │   ├── PublicDirectory.java
+        │   └── RealFileFinder.java
+        ├── HttpServer.java
+        ├── Main.java
+        ├── Request.java
+        ├── Response.java
+        ├── ServerConfiguration.java
+        ├── Status.java
+        ├── controllers
+        │   ├── Application.java
+        │   ├── Controller.java
+        │   ├── HelloWorldController.java
+        │   ├── InvalidRequestController.java
+        │   ├── RedirectController.java
+        │   ├── Router.java
+        │   └── StaticFilesController.java
+        └── utility
+            ├── BufferedLineReader.java
+            ├── CommandLineArguments.java
+            ├── Exit.java
+            ├── InMemoryAppender.java
+            ├── LineReader.java
+            └── SystemExit.java
+</code></pre></div><p>The packages I have at the moment are <code>http</code>, <code>ContentGeneration</code>, <code>FileSystem</code>, <code>Controllers</code>, and
+<code>Utility</code>.</p><h4 id=granularity-the-principles-of-package-cohesion><strong>Granularity: The Principles of Package Cohesion</strong></h4><p><strong>The Reuse-Release Equivalence Principle (REP):</strong></p><p>REP means that the package must be created with reusable classes. In other words, Either all of the
+classes inside the package are reusable or none of them are. The classes must also be of the
+same family which means that classes that are unrelated to the purpose of the package should not
+be included.</p><p>I believe the contents of the <code>Utility</code> package violates this principle. I almost think it could adhere
+considering the purpose of classes within the package are helpers however they are unrelated to one
+another. They would also change for different reasons (see the following principles).</p><p>On the other hand, I think all of the classes within the <code>Controllers</code>, <code>FileSystem</code>, and <code>ContentGeneration</code> packages are within the same family and serve the same purpose, thus adhering to the principle.</p><p><strong>The Common-Reuse Principle (CRP):</strong></p><p>CRP states that classes that tend to be reused together belong in the same package together. It is a way
+of helping to decide which classes belong in which packages. If you reuse on of the classes in a package,
+you reuse them all. Classes which are not tightly bound to each other should not belong in the same
+package.</p><p>I think in some areas I am adhering to this specific principle. Specifically, the <code>Controller</code> package.
+The entry point to this package is the <code>Application</code> class which relies on all the other classes. In order
+to use <code>Application</code> you have to use the rest of the classes. This also applies to the <code>FileSystem</code> and
+<code>ContentGeneration</code> packages.</p><p>The violator in this case would be the <code>Utility</code> package. It&rsquo;s a package that I&rsquo;ve stuck some random
+helper classes; most of them are wrappers aside from <code>CommandLineArguments</code>. Based on this principle,
+these classes do not belong together in the same package.</p><p><strong>The Common-Closure Principle (CCP):</strong></p><p>CCP states that the package should not have more than one reason to change. If changes were to happen in
+an application dependent on a number of packages, ideally you&rsquo;d only want changes to occur in one package
+rather than in a number of them. This helps to identify classes that are likely to change, and package
+them together for the same reasons. In other words, if classes are tightly coupled, they belong in the
+same package</p><p>The glaring violator here, again, is the <code>Utility</code> package. These classes are not tightly bound to each
+other and this package has many reasons to change. I do, however, think that the <code>Controllers</code>, <code>FileSystem</code>, and <code>ContentGeneration</code> are adhering to this principle in the sense that they would change
+for the same reasons.</p><h4 id=stability-the-principles-of-package-coupling><strong>Stability: The Principles of Package Coupling</strong></h4><p><strong>The Acyclic-Dependencies Principle (ADP):</strong></p><p>ADP states that &ldquo;the dependency graph of packages or components should have no cycles&rdquo;. In other words,
+there should be no circular dependencies between packages. When you have cyclic dependencies, a change to
+any packages triggers an update in every package. When you have cyclic dependencies, you lose
+the barriers between packages which is the main benefit of packages.</p><p>After drawing a couple of diagrams, which was rather enlightening, I didn&rsquo;t identify any violations of this
+principle. With that said, this is something I will need to keep in mind as I refactor my package
+structure.</p><p><strong>The Stable-Dependencies Principle (SDP):</strong></p><p>The idea behind SDP is to depend in the direction of stability. Modules that are intended to be easy to
+change should not be depended on by modules that are harder to change. Put simply, stable packages
+shouldn&rsquo;t depend on unstable packages.</p><p>Admittedly, this was a hard one for me. I know that I have one or two packages depending on the <code>Utility</code>
+package which needs to be refactored but its a very stable package. Trying to identify this principle made
+me realize that I struggle with identifying unstable modules.</p><p><strong>The Stable-Abstractions Principle (SAP):</strong></p><p>SAP states that a stable package should also be abstract, so that its stability does not prevent it from
+being extended. It also states that an unstable package should be concrete, since its stability allows the
+concrete code within to be easily changed.</p><p>I tend to struggle with things that sound subjective like &ldquo;stability&rdquo; because, well, its subjective.
+With that said, I don&rsquo;t believe I am adhering to this particular principle in the sense that I do not
+have any abstract classes within my packages. This is something I hope to work towards once I get my
+packages in adherence with the 3 cohesion package principles.</p><h4 id=conclusion><strong>Conclusion</strong></h4><p>Its clear that I need to rethink and refactor the <code>Utility</code> package as it&rsquo;s violating more than one of the
+package principles. I&rsquo;ve been in the habit of putting things that appear to be the same (like helper
+classes) into the same package and it&rsquo;s something I need to be more cognizant of going forward.</p><p>I also realized that I need to put some of the classes that are within the <code>http</code> &ldquo;parent&rdquo; package
+into their own packages. 99% of the time I find more clarity in concepts after writing a blog post.
+I will admit that I definitely understand the 3 cohesion principles significantly better compared to
+when I read about them the first time in PPP. But, I still find the package coupling principles a little
+confusing. I hope with time and experience they will begin to make sense, in the way that the SOLID principles eventually clicked for me.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-03-28-package.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-03-proxy/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Proxy Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-03-26-web/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Web Abstractions</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents><ul><li><ul><li><ul><li><a href=#granularity-the-principles-of-package-cohesion><strong>Granularity: The Principles of Package Cohesion</strong></a></li><li><a href=#stability-the-principles-of-package-coupling><strong>Stability: The Principles of Package Coupling</strong></a></li><li><a href=#conclusion><strong>Conclusion</strong></a></li></ul></li></ul></li></ul></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

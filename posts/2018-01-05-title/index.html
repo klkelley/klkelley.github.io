@@ -1,0 +1,54 @@
+<!doctype html><html><head><title>DRY principle</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Breaking down the DRY principle"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>January 5, 2018</p></div><div class=title><h1>DRY principle</h1></div><div class=post-content id=post-content><p>Over the past year I&rsquo;ve come across the concept of DRY (Do not Repeat Yourself)
+time and time again. It was one of the first software principles that made sense to me
+and happened to be one of the first principles I would usually attempt to apply
+in my code.</p><p>The DRY principle states &ldquo;Every piece of knowledge should have one and only one
+representation.&rdquo; It is also expressed as &ldquo;Once and Only Once.&rdquo; That last expression
+is what I took very literally and overlooked the concept of <em>knowledge</em>.</p><p>I judiciously applied this principle by looking for code that looked the same which would
+imply <strong>duplication</strong>. This week I began reading <a href=http://www.r-5.org/files/books/computers/languages/ruby/main/Corey_Haines-The_Four_Rules_of_Simple_Design-EN.pdf>Understanding the Four Rules of Simple Design</a>
+by Corey Haines. It wasn&rsquo;t soon after I started reading that realized I had
+been applying this principle incorrectly.</p><p>Instead of focusing on textual duplication the correct way to apply this principle
+involves looking for <em>knowledge duplication</em>. Apparently, I&rsquo;m not the first nor the last person to have this
+misconception about applying the DRY principle that seems to often stem from fixation on the
+&ldquo;Once and Only Once&rdquo; expression.</p><p>Let&rsquo;s look at this example which happens to be a snippet from the bowling game kata I&rsquo;ve been working
+on each day this week.</p><pre><code>public class BowlingGame {
+  //...
+
+  private boolean isSpare(int frameIndex) {
+       return rolls[frameIndex] + rolls[frameIndex+1] == 10;
+   }
+
+   private boolean isStrike(int frameIndex) {
+       return rolls[frameIndex] == 10;
+   }
+ }
+</code></pre><p>At first glance, you can notice textual duplication. Right off the bat I notice
+<code>rolls[frameIndex]</code> and comparison to <code>10</code>. I have the temptation to extract it even further
+because it seems like duplication. One technique I picked up from reading Understanding the
+Four Simple Rules of Design is to look past the textual duplication and instead
+<strong>explicitly name the concepts prior to eliminating the perceived duplication</strong>.</p><p>Let&rsquo;s give that a try using the same code example.</p><pre><code>public class BowlingGame {
+  //...
+
+  private boolean isSpare(int frameIndex) {
+       // is the current frame considered a spare?
+   }
+
+   private boolean isStrike(int frameIndex) {
+       // is the current frame considered a strike?
+   }
+ }
+</code></pre><p>While this example may seem a bit contrived, it shows that the comparison
+to <code>10</code> and reference to <code>rolls[frameIndex]</code> in each of these functions
+both represent different <em>pieces of knowledge</em>. The first function is checking to see
+if the frame is considered a spare. The second function is checking to see if the
+frame is considered a strike. Both are different pieces of knowledge.
+I will have to take some time to unlearn, if you will,
+the way I&rsquo;ve applied DRY up until now but this is also a reminder to myself not to
+overlook concepts that I believe I have an understanding of.</p><p>With this in mind, I also hope to dedicate a few blog posts to other design principles, i.e. SOLID,
+in the future so I can properly flesh out my understanding of their application as well.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-01-05-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-01-09-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Presenter Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-01-03-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>What's Maven?</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

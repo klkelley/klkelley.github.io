@@ -1,0 +1,211 @@
+<!doctype html><html><head><title>State Pattern</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="What's the State Pattern?"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>January 30, 2018</p></div><div class=title><h1>State Pattern</h1></div><div class=post-content id=post-content><p>The State Pattern is defined as:</p><blockquote><p>&ldquo;Allows an object to alter its behavior when its internal state changes. The object will appear
+to change its class&rdquo;</p></blockquote><p>This pattern is a behavioral pattern, like the strategy pattern, and it&rsquo;s used to manage
+algorithms, relationships and responsibilities between objects. Said another way, it allows
+objects to behave in different ways depending on the interal state.</p><p>This pattern is used when you need a class to behave differently, based on some arguments
+passed through the class at runtime. So if we need to change behavior of an object based on its
+state, we can have a state variable in the Object. The State Pattern helps to provide a loosely
+coupled way to achieve this with <code>Context</code> and <code>State</code> implementations.</p><p>Here is a generic class diagram that implements the State Pattern:</p><p><img src=http://www.thejavageek.com/wp-content/uploads/2016/10/Generic-State-Design-Pattern.jpg alt=uml-diagram title="State Pattern"></p><p><code>Context</code>: Used by clients of the state pattern; clients do not access the state objects directly. It maintains references to concrete state object which may be used to define the current state of the object.</p><p><code>State</code>: Defines an interface for declaring what each concrete state should do.</p><p><code>ConcreteState</code>: Provides implementation for methods defined in <code>State</code>.</p><p>If you&rsquo;re thinking this looks similar to the Strategy Pattern, you&rsquo;re right. They are similar but they are different in their intent. The Strategy pattern&rsquo;s intent is to have a family of interchangable algorithms which can be chosen based on the client&rsquo;s need while the state pattern&rsquo;s intent is to manage the states of the object.</p><p>As usual, I think this is best demostrated by starting off with an example then we will refactor it using the
+State Pattern.</p><p>Say we have to build an application for a soda vending machine. A vending machine as four different states: No coin inserted, coin inserted, dispensing, and empty. This is one way we could build it.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SodaVendingMachine</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> NO_SODA <span style=color:#f92672>=</span> 0<span style=color:#f92672>;</span> 
+  <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> NO_COIN <span style=color:#f92672>=</span> 1<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> CONTAINS_COIN <span style=color:#f92672>=</span> 2<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> DISPENSE <span style=color:#f92672>=</span> 3<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>int</span> count<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>int</span> state <span style=color:#f92672>=</span> NO_SODA<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>SodaVendingMachine</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> numberOfSodas<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>count</span> <span style=color:#f92672>=</span> numberOfSodas<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>count <span style=color:#f92672>&gt;</span> 0<span style=color:#f92672>)</span> state <span style=color:#f92672>=</span> NO_COIN<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> CONTAINS_COIN<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>printlin</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Coin already inserted.&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> NO_COIN<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      state <span style=color:#f92672>=</span> CONTAINS_COIN<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> NO_SODA<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;No soda available!&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> DISPENSE<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Error. System is currently dispensing soda.&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>pressButton</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> CONTAINS_COIN<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      state <span style=color:#f92672>=</span> DISPENSE<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> NO_COIN<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Please insert coin&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> NO_SODA<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;No soda available&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>state <span style=color:#f92672>==</span> DISPENSE<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Please insert coin&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>dispense</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// you get the point.. 
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span> <span style=color:#f92672>--&gt;</span>
+
+</code></pre></div><p>This has already become hard to read and is clearly a violation of the Single Resonsibility Principle as we have the same pieces of knowledge spread in several different places. Also, what if our soda machine received an upgrade and we needed to add new functionality? We would have to modify the class which is an Open-Closed Principle violation. The way we can apply the State Pattern here is by encapsulating each of these <code>if/else</code> branches in its own class. We need to encapsulate what <em>varies</em>.</p><p>Here&rsquo;s how we can refactor it.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>SodaVendingMachineState</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>();</span>
+  <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>pressButton</span><span style=color:#f92672>();</span>
+  <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>dispense</span><span style=color:#f92672>();</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#75715e>// this is our State interface
+</span></code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>NoCoinState</span> <span style=color:#66d9ef>implements</span> SodaVendingMachineState <span style=color:#f92672>{</span>
+  SodaVendingMachine machine<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>NoCoinState</span><span style=color:#f92672>(</span>SodaVendingMachine machine<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>machine</span> <span style=color:#f92672>=</span> machine<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    machine<span style=color:#f92672>.</span><span style=color:#a6e22e>setState</span><span style=color:#f92672>(</span>machine<span style=color:#f92672>.</span><span style=color:#a6e22e>getContainsCoinState</span><span style=color:#f92672>());</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>pressButton</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Please insert a coin&#34;</span><span style=color:#f92672>);</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>dispense</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Please insert a coin&#34;</span><span style=color:#f92672>);</span>
+  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>ContainsCoinState</span> <span style=color:#66d9ef>implements</span> SodaVendingMachineState <span style=color:#f92672>{</span>
+  SodaVendingMachine machine<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>ContainsCoinState</span><span style=color:#f92672>(</span>SodaVendingMachine machine<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>machine</span> <span style=color:#f92672>=</span> machine<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Coin already inserted.&#34;</span><span style=color:#f92672>);</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>pressButton</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    machine<span style=color:#f92672>.</span><span style=color:#a6e22e>setState</span><span style=color:#f92672>(</span>machine<span style=color:#f92672>.</span><span style=color:#a6e22e>getDispensedState</span><span style=color:#f92672>());</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>dispense</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Press button to dispense&#34;</span><span style=color:#f92672>)</span>
+  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>DispensedState</span> <span style=color:#66d9ef>implements</span> SodaVendingMachineState <span style=color:#f92672>{</span>
+  SodaVendingMachine machine<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>DispensedState</span><span style=color:#f92672>(</span>SodaVendingMachine machine<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>machine</span> <span style=color:#f92672>=</span> machine<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Error. System is currently dispensing&#34;</span><span style=color:#f92672>);</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>pressButton</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Error. System is currently dispensing.&#34;</span><span style=color:#f92672>);</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>dispense</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>machine<span style=color:#f92672>.</span><span style=color:#a6e22e>getCount</span><span style=color:#f92672>()</span> <span style=color:#f92672>&gt;</span> 0<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      machine<span style=color:#f92672>.</span><span style=color:#a6e22e>setState</span><span style=color:#f92672>(</span>machine<span style=color:#f92672>.</span><span style=color:#a6e22e>getNoCoinState</span><span style=color:#f92672>());</span>
+      machine<span style=color:#f92672>.</span><span style=color:#a6e22e>setCount</span><span style=color:#f92672>(</span>machine<span style=color:#f92672>.</span><span style=color:#a6e22e>getCount</span><span style=color:#f92672>()</span> <span style=color:#f92672>-</span> 1<span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#f92672>{</span>
+      System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;No sodas available&#34;</span><span style=color:#f92672>);</span>
+      machine<span style=color:#f92672>.</span><span style=color:#a6e22e>setState</span><span style=color:#f92672>(</span>machine<span style=color:#f92672>.</span><span style=color:#a6e22e>getNoSodaState</span><span style=color:#f92672>());</span>
+    <span style=color:#f92672>}</span>
+  <span style=color:#f92672>}</span>
+ <span style=color:#f92672>}</span>
+
+ <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>NoSodaState</span> <span style=color:#66d9ef>implements</span> SodaVendingMachineState <span style=color:#f92672>{</span>
+  SodaVendingMachine machine<span style=color:#f92672>;</span>
+  <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span> <span style=color:#f92672>}</span>
+
+ <span style=color:#75715e>// these are the ConcreteStates
+</span></code></pre></div><p>Now onto our <code>Context</code>&mldr;</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SodaVendingMachine</span> <span style=color:#f92672>{</span>
+  SodaVendingMachineState noCoinState<span style=color:#f92672>;</span>
+  SodaVendingMachineState noSodaState<span style=color:#f92672>;</span>
+  SodaVendingMachineState dispensedState<span style=color:#f92672>;</span>
+  SodaVendingMachineState containsCointState<span style=color:#f92672>;</span>
+  SodaVendingMachineState state<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>int</span> count<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>SodaVendingMachine</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> sodaCount<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    count <span style=color:#f92672>=</span> sodaCount<span style=color:#f92672>;</span>
+    noCoinState <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> NoCoinState<span style=color:#f92672>(</span><span style=color:#66d9ef>this</span><span style=color:#f92672>);</span>
+    noSodaState <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> NoSodaState<span style=color:#f92672>(</span><span style=color:#66d9ef>this</span><span style=color:#f92672>);</span>
+    dispensedState <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> DispensedState<span style=color:#f92672>(</span><span style=color:#66d9ef>this</span><span style=color:#f92672>);</span>
+    containsCoinState <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ContainsCoinState<span style=color:#f92672>(</span><span style=color:#66d9ef>this</span><span style=color:#f92672>);</span>
+    state <span style=color:#f92672>=</span> noCoinState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Coin inserted.&#34;</span><span style=color:#f92672>);</span>
+    state<span style=color:#f92672>.</span><span style=color:#a6e22e>insertCoin</span><span style=color:#f92672>();</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>pressButton</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Button pressed.&#34;</span><span style=color:#f92672>);</span>
+    state<span style=color:#f92672>.</span><span style=color:#a6e22e>pressButton</span><span style=color:#f92672>();</span>
+    state<span style=color:#f92672>.</span><span style=color:#a6e22e>dispense</span><span style=color:#f92672>();</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> SodaVendingMachineState <span style=color:#a6e22e>getNoSodaState</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>return</span> noSodaState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>setNoSodaState</span><span style=color:#f92672>(</span>SodaVendingMachineState noSodaState<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>noSodaState</span> <span style=color:#f92672>=</span> noSodaState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> SodaVendingMachineState <span style=color:#a6e22e>getNoCoinState</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>return</span> noCoinState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>setNoCoinState</span><span style=color:#f92672>(</span>SodaVendingMachineState noCoinState<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>noCoinState</span> <span style=color:#f92672>=</span> noCoinState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>getCount</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>return</span> count<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>setCount</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> count<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>count</span> <span style=color:#f92672>=</span> count<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>setState</span><span style=color:#f92672>(</span>SodaVendingMachineState state<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>state</span> <span style=color:#f92672>=</span> state<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> SodaVendingMachineState <span style=color:#a6e22e>getContainsCoinState</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>return</span> containsCoinState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>setContainsCoinState</span><span style=color:#f92672>(</span>SodaVendingMachineState containsCoinState<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>containsCoinState</span> <span style=color:#f92672>=</span> containsCoinState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> SodaVendingMachineState <span style=color:#a6e22e>getDispensedState</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>return</span> dispensedState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>setDispensedState</span><span style=color:#f92672>(</span>SodaVendingMachineState dispensedState<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>dispensedState</span> <span style=color:#f92672>=</span> dispensedState<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+</code></pre></div><p>So in our <code>Context</code> (i.e. <code>SodaVendingMachine</code>) we defined instance variables for all the different states available and we have an instance variable <code>state</code> that keeps track of the current state of the machine. In <code>pressButton()</code> and <code>insertCoin()</code> we delegate the call to those methods to the current state object. The rest of the methods are simply getter and setter methods.
+Each of the different states are now encapsulated in their respective classes and they are closed for modification. If we have a new state we can create a new class. You can also see that we removed the need for all of the <code>if/else</code> clauses that we relied on in our first iteration of this sample application.</p><p>This is a great pattern to apply if you need to alter the behavior of an object based on it&rsquo;s internal state.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-01-30-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-02-07-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>SOLID&amp;#58; Dependency Inversion Principle</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-01-23-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>SOLID&amp;#58; Interface Segregation Principle</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

@@ -1,0 +1,69 @@
+<!doctype html><html><head><title>SOLID&amp;#58; Interface Segregation Principle</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Learning about ISP"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>January 23, 2018</p></div><div class=title><h1>SOLID&amp;#58; Interface Segregation Principle</h1></div><div class=post-content id=post-content><p>The Interface Segregation Principle states:</p><blockquote><p>&ldquo;Clients should not be forced to depend on methods they do not use.&rdquo;</p></blockquote><p>What that means is that your interfaces should not be bloated with methods that implementing classes don&rsquo;t require. Such interfaces are referred to as &ldquo;fat&rdquo; interfaces. ISP favors small, specific interfaces so that clients only have to know about the methods that are of interest to them which are often referred to as &ldquo;role&rdquo; interfaces.</p><p>If a class has to implement a &ldquo;fat&rdquo; interface then it is required to provide empty/fake implementations of those methods it doesn&rsquo;t use. Those classes are then subject to change when the interface changes.</p><p>Let&rsquo;s take a look at an example that first violates ISP. Our interface defines the common behaviors of Animals.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Animal</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sleep</span><span style=color:#f92672>();</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>walk</span><span style=color:#f92672>();</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>fly</span><span style=color:#f92672>();</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>eat</span><span style=color:#f92672>();</span>
+  <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span><span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Bird</span> <span style=color:#66d9ef>implements</span> Animal <span style=color:#f92672>{</span>
+  <span style=color:#75715e>//..
+</span><span style=color:#75715e></span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>walk</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>fly</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>eat</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Tiger</span> <span style=color:#66d9ef>implements</span> Animal <span style=color:#f92672>{</span>
+  <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>walk</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>fly</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+     <span style=color:#75715e>// Tigers can&#39;t fly
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>eat</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+</code></pre></div><p>We know that many animals have the ability to fly but right now our <code>Tiger</code> class
+has to make a fake implementation of the <code>fly()</code> method. A <code>Tiger</code> doesn&rsquo;t need to know anything about flying behavior. For each type of animal that cannot fly we would have to deal with providing a fake implementation of <code>fly()</code>. This is not a good design decision.</p><p>Instead, let&rsquo;s pair down our interface so implementing classes only need to know about behavior they will use.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Animal</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sleep</span><span style=color:#f92672>();</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>eat</span><span style=color:#f92672>();</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Flyable</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>fly</span><span style=color:#f92672>();</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Walkable</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>walk</span><span style=color:#f92672>();</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Bird</span> <span style=color:#66d9ef>implements</span> Animal<span style=color:#f92672>,</span> Flyable<span style=color:#f92672>,</span> Walkable <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span><span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Tiger</span> <span style=color:#66d9ef>implements</span> Animal<span style=color:#f92672>,</span> Walkable <span style=color:#f92672>{</span>
+  <span style=color:#75715e>// ..
+</span><span style=color:#75715e></span><span style=color:#f92672>}</span>
+
+</code></pre></div><p>This example may seem contrived but I decided to create a <code>Walkable</code> interface because just like not all animals can fly, not all animals can walk. Now <code>Tiger</code> and all subsequent non-flyable animals do not need to implement unused behaviors.</p><p>It&rsquo;s hard not to notice the Single Responsibility principle shining through a bit here. Both ISP and SRP share the same goal of ensuring small, specific, and highly cohesive modules. If you find that you have a class that is implementing behavior from an interface it doesn&rsquo;t need, it&rsquo;s highly likely you are violating ISP and may need to rethink your implementation. Interfaces belong to clients, not the implementations therefore they should be designed in a way to best suite the clients.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-01-23-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-01-30-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>State Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-01-22-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>SOLID&amp;#58; Liskov Substitution Principle</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

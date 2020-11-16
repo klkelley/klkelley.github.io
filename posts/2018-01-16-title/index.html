@@ -1,0 +1,46 @@
+<!doctype html><html><head><title>SOLID&amp;#58; Single Responsibility Principle</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Diving into into SRP"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>January 16, 2018</p></div><div class=title><h1>SOLID&amp;#58; Single Responsibility Principle</h1></div><div class=post-content id=post-content><p>For the next few posts I will be focusing on each each of the SOLID principles.
+The first principle is the Single Responsibility Principle, which I lightly touched on in a
+<a href=https://www.karakelley.me/2018/01/05/title.html>previous post</a>.</p><p>The Single Responsibility Principle states &ldquo;<em>A class or module should have only one reason to change</em>&rdquo;.</p><p>When I first read that definition I wondered, what constitutes as change? One of the statements I read
+in Agile Software Development: Principles, Patterns, and Practices really stuck. <em>Each responsibility is an axis
+of change</em>". If a class or module has more than one <em>responsibility</em> then it has more than one reason to change.
+In essence, SRP isn&rsquo;t just about change but also responsibility; they are intertwined.</p><p>One of the first software design books I read was POODR (Practical Object Oriented Design in Ruby) by Sandi Metz and she states that if you describe your class or module using the word &ldquo;and&rdquo; or &ldquo;or&rdquo; then your class or module
+has more than one responsibility. I find using that rule of thumb as a helpful way in identifying SRP violations.</p><p>Let&rsquo;s illustrate a violation of the Single Responsibility Principle using some examples.</p><pre><code>public class Game() {
+
+  public void takeTurn() {
+  	//..
+  }
+
+  public boolean tie() {
+  	//..
+  }
+
+  public boolean winner() {
+  	//..
+  }
+}
+</code></pre><p>At this point, here is what the <code>Game</code> class is responsible for:</p><ol><li>Taking turns between players (<code>takeTurn()</code>)</li><li>Game rules (<code>tie()</code> and <code>winner()</code>)</li></ol><p>This means that <code>Game</code> is responsible for game flow <em>AND</em> rules. The <code>Game</code> class has two reasons to change right now meaning that it is in clear violation of the Single Responsibility principle. If any changes need to be made to the rules then the likelihood of it negatively impacting the game flow is rather high. In a way, it does make sense that a <code>Game</code> should know how about game flow and if a game has been won but I think changing course in the class names would help figure out where these responsibilities really belong.</p><p>A <code>GameRules</code> or <code>GameState</code> class would be more appropriate for determining if the game is won while a <code>Game</code> would be responsible for game flow. Let&rsquo;s refactor our code example to adhere to SRP.</p><pre><code>public class Game() {
+
+  public void takeTurn() {
+  	//..
+  }
+}
+
+public class GameRules() {
+
+  public boolean tie() {
+  	//..
+  }
+
+  public boolean winner() {
+    //..
+  }
+}
+</code></pre><p>Now that we&rsquo;ve refactored, if we need to implement new game rules logic, only <code>GameRules</code> needs to change. If we
+need to add a new feature that changes game flow, only <code>Game</code> needs to change.</p><p>One thing I want to note is that SRP is not just applicable to classes. It can (and should) be applied to methods and functions as well, which is something I have failed to remember at times. As I&rsquo;ve worked on getting better at Test-Driven Development I can&rsquo;t help but notice how much using a test-driven approach has helped separate responsibilities from the beginning.</p><p>The Single Responsibility principle helps us achieve cohesion and reduces coupling and fragility in our code. Applying SRP results in several benefits including: easier to understand code, increased maintainability, and increased reusability. I foresee the theme of SRP being present in the upcoming posts for each of the SOLID principles.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-01-16-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-01-17-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>SOLID&amp;#58; Open-Closed Principle</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-01-11-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Java Interfaces</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

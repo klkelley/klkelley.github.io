@@ -1,0 +1,70 @@
+<!doctype html><html><head><title>SOLID&amp;#58; Dependency Inversion Principle</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Dipping into DIP"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>February 7, 2018</p></div><div class=title><h1>SOLID&amp;#58; Dependency Inversion Principle</h1></div><div class=post-content id=post-content><p>The Dependency Inversion Principle states:</p><blockquote><p>&ldquo;High level modules should not depend on low level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.&rdquo;</p></blockquote><p>Put simply, the Dependency Inversion Principle says that you should
+depend on abstractions and not concretions.</p><p>Let&rsquo;s take a look at this example which violates the Dependency Inversion
+Principle. What if we wanted to build an application that sent notifications to users via email.
+This is one way to do it:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Email</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> String emailAddress<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String subject<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String content<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sendEmail</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// .. 
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Notification</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> Email email<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Notification</span><span style=color:#f92672>(</span>Email email<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>email</span> <span style=color:#f92672>=</span> email<span style=color:#f92672>;</span> 
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>Send</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    email<span style=color:#f92672>.</span><span style=color:#a6e22e>sendEmail</span><span style=color:#f92672>();</span>
+  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+</code></pre></div><p>Cool, this doesn&rsquo;t look so bad. But wait, on second thought, this means we can&rsquo;t send notifications any other way. It&rsquo;s 2018 after all and we&rsquo;d like to
+be able to send notifications via SMS. Right now, we can&rsquo;t do that. <code>Notification</code> currently only supports <code>Email</code>. The system is coupled and rigid. It&rsquo;s nearly impossible to send a notification any other way. Our high level module <code>Notification</code> is dependent on a low level module, <code>Email</code>.</p><p>Let&rsquo;s try our hand at refactoring this using the Dependency Inversion Principle. In Java, we can create an abstraction using interfaces.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Notifiable</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> sendNotification<span style=color:#f92672>;</span>
+<span style=color:#f92672>}</span>
+
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Email</span> <span style=color:#66d9ef>implements</span> Notifiable <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> String emailAddress<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String subject<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String content<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>send</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// .. 
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Notification</span>  <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> Notifiable notification<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Notification</span><span style=color:#f92672>(</span>Notifiable notification<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>notification</span> <span style=color:#f92672>=</span> notification<span style=color:#f92672>;</span> 
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>send</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    notification<span style=color:#f92672>.</span><span style=color:#a6e22e>send</span><span style=color:#f92672>();</span>
+  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+</code></pre></div><p>Now <em>when</em> we need to add SMS capability we can simply add a new class that implements the <code>Notifiable</code> interface like so.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SMS</span> <span style=color:#66d9ef>implements</span> Notifiable <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> String phoneNumber<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String message<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>send</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+    <span style=color:#75715e>// .. 
+</span><span style=color:#75715e></span>  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+</code></pre></div><p>The idea here is to rely on an abstraction instead of a concretion. I know I said that already but it&rsquo;s really the point here.
+The same idea applies if we were building a Tic Tac Toe game and our <code>Game</code> took two <code>HumanPlayers</code>. Our game just needs players, it shouldn&rsquo;t care what kind, it should work with any type of player. But if we hard code our <code>Game</code> to be coupled to <code>HumanPlayers</code> we can&rsquo;t support new player types like <code>ComputerPlayer</code>. Instead, we could implement a <code>Player</code> interface and have all different types of players implement the <code>Player</code> interface. This would allow the game to support any type of player.</p><p>While this is not a hard fast rule, if you find yourself using the <code>new</code> inside a class or small changes in your application create a ripple effect, it&rsquo;s likely you are violating the Dependency Inversion Principle.</p><p>Adhering to the Dependency Inversion Principle will allow your classes to become more &ldquo;pluggable&rdquo; (see below for a literal example) which in turn allows them to be changed independently without affecting other classes. You will end up with more code, classes, and interfaces but it enhances the flexibility of your code. This is something I have to keep in mind; More code or more classes isn&rsquo;t necessarily a bad thing. In hindsight, I wish this principle was the first of the SOLID principles I learned and subsequently blogged about. While this is a personal opinion, I believe that understanding this principle helps you really understand all of the other SOLID principles (and many design patterns for the matter) in a much clearer way.</p><p>I also had to include this because the first time I saw this picture it really helped me understand the value and importance of the Dependency Inversion
+Principle.</p><p><img src=https://cdn-images-1.medium.com/max/1600/1*oKPt6tRc5YWspA2RoTNTTg.jpeg alt="DIP picture"></p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-02-07-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-02-08-tdd-patterns/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Test-Driven Development Patterns</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-01-30-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>State Pattern</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>

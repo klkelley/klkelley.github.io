@@ -1,0 +1,124 @@
+<!doctype html><html><head><title>Builder Pattern</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Building objects with builder pattern"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>April 11, 2018</p></div><div class=title><h1>Builder Pattern</h1></div><div class=post-content id=post-content><p>The intent of the builder pattern is to:</p><blockquote><p>Separate the construction of a complex object from its representation
+so that the same construction process can create different representations</p></blockquote><p>In a nutshell, it&rsquo;s concerned with the creation of objects. I know off the top of my
+head there is another pattern that is also concerned with the creation of objects,
+the factory method pattern. There may be more that I am not aware of. So, why do we
+need another pattern for creating objects?</p><p>While its true the builder pattern is concerned with the creation of objects, it really helps to solve problems like too many arguments in a constructor. You don&rsquo;t realize this is a problem to solve until you actually have an object that takes multiple parameters and you continually forget the order of them.</p><p>Let&rsquo;s start off with an example. Consider we are working on an application for a bank. This is what it could look like after our first iteration.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>BankAccount</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String owner<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>BankAccount</span><span style=color:#f92672>(</span><span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>,</span> String owner<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>accountNumber</span> <span style=color:#f92672>=</span> accountNumber<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>owner</span> <span style=color:#f92672>=</span> owner<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>balance</span> <span style=color:#f92672>=</span> balance<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#75715e>// .. getters and setters for all the fields
+</span><span style=color:#75715e></span>
+<span style=color:#f92672>}</span>
+
+</code></pre></div><p>We can easily instantiate our simple bank account like so:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>BankAccount newAccount <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> BankAccount<span style=color:#f92672>(</span>980L<span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Kara&#34;</span><span style=color:#f92672>,</span> 2000<span style=color:#f92672>.</span><span style=color:#a6e22e>00</span><span style=color:#f92672>);</span>
+</code></pre></div><p>But, as always, new requirements come in and we need to beef up our class to take
+some more arguments.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
+<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>BankAccount</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String owner<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String branch<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> interestRate<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>BankAccount</span><span style=color:#f92672>(</span><span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>,</span> String branch<span style=color:#f92672>,</span> String owner<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> interestRate<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>accountNumber</span> <span style=color:#f92672>=</span> accountNumber<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>owner</span> <span style=color:#f92672>=</span> owner<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>balance</span> <span style=color:#f92672>=</span> balance<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>branch</span> <span style=color:#f92672>=</span> branch<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>interestRate</span> <span style=color:#f92672>=</span> interestRate<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#75715e>// .. getters and setters for all of the fields 
+</span><span style=color:#75715e></span><span style=color:#f92672>}</span>
+
+</code></pre></div><p>Not so bad.. we could instantiate a new bank account again, like so:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>BankAccount account1 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> BankAccount<span style=color:#f92672>(</span>809L<span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Chicago&#34;</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Roger Waters&#34;</span><span style=color:#f92672>,</span> 2000<span style=color:#f92672>.</span><span style=color:#a6e22e>00</span><span style=color:#f92672>,</span> 4<span style=color:#f92672>.</span><span style=color:#a6e22e>3</span><span style=color:#f92672>);</span>
+BankAccount account2 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> BankAccount<span style=color:#f92672>(</span>740L<span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Kurt Vile&#34;</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;Seattle&#34;</span><span style=color:#f92672>,</span> 3<span style=color:#f92672>.</span><span style=color:#a6e22e>4</span><span style=color:#f92672>,</span> 5000<span style=color:#f92672>.</span><span style=color:#a6e22e>00</span><span style=color:#f92672>);</span>
+</code></pre></div><p>Sure, this example might be a tad extreme because we don&rsquo;t have that many constructor
+arguments but there&rsquo;s enough. When you have multiple consecutive arguments of the same
+type it can be easy to accidentally swap them around and the compiler would never catch this type of error. And we know that even more parameters will eventually be
+added to this constructor so we can use the builder pattern to alleviate some of this
+pain.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>BankAccount</span> <span style=color:#f92672>{</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String owner<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> String branch<span style=color:#f92672>;</span>
+  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> interestRate<span style=color:#f92672>;</span>
+
+  <span style=color:#66d9ef>private</span> <span style=color:#a6e22e>BankAccount</span><span style=color:#f92672>(</span><span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>,</span> String branch<span style=color:#f92672>,</span> String owner<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> interestRate<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>accountNumber</span> <span style=color:#f92672>=</span> accountNumber<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>owner</span> <span style=color:#f92672>=</span> owner<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>balance</span> <span style=color:#f92672>=</span> balance<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>branch</span> <span style=color:#f92672>=</span> branch<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>interestRate</span> <span style=color:#f92672>=</span> interestRate<span style=color:#f92672>;</span>
+  <span style=color:#f92672>}</span>
+
+  <span style=color:#75715e>//..  getters and other methods
+</span><span style=color:#75715e></span>
+  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Builder</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>private</span> String owner<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> balance<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>private</span> String branch<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> interestRate<span style=color:#f92672>;</span>
+
+    <span style=color:#66d9ef>public</span> Builder <span style=color:#a6e22e>setAccountNumber</span><span style=color:#f92672>(</span><span style=color:#66d9ef>long</span> accountNumber<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>accountNumber</span> <span style=color:#f92672>=</span> accountNumber<span style=color:#f92672>;</span>
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+
+    <span style=color:#66d9ef>public</span> Builder <span style=color:#a6e22e>setOwner</span><span style=color:#f92672>(</span>String owner<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>owner</span> <span style=color:#f92672>=</span> owner<span style=color:#f92672>;</span>
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+
+    <span style=color:#66d9ef>public</span> Builder <span style=color:#a6e22e>setBalance</span><span style=color:#f92672>(</span><span style=color:#66d9ef>double</span> balance<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>balance</span> <span style=color:#f92672>=</span> balance<span style=color:#f92672>;</span>
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+
+    <span style=color:#66d9ef>public</span> Builder <span style=color:#a6e22e>setBranch</span><span style=color:#f92672>(</span>String branch<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>branch</span> <span style=color:#f92672>=</span> branch<span style=color:#f92672>;</span>
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+
+    <span style=color:#66d9ef>public</span> Builder <span style=color:#a6e22e>setInterestrate</span><span style=color:#f92672>(</span><span style=color:#66d9ef>double</span> interestRate<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+      <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>interestRate</span> <span style=color:#f92672>=</span> interestRate<span style=color:#f92672>;</span>
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>this</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+
+    <span style=color:#66d9ef>public</span> BankAccount <span style=color:#a6e22e>build</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> BankAccount<span style=color:#f92672>(</span>accountNumber<span style=color:#f92672>,</span> branch<span style=color:#f92672>,</span> owner<span style=color:#f92672>,</span> balance<span style=color:#f92672>,</span> interestRate<span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span>
+  <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+
+</code></pre></div><p>I&rsquo;ll note that you don&rsquo;t have to make your Builder class nested, it&rsquo;s just a common
+convention. You could make it a standalone class and it&rsquo;ll do just the same.</p><p>We can then create new <code>BankAccount</code> objects like so:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>BankAccount account <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> BankAccount<span style=color:#f92672>.</span><span style=color:#a6e22e>Builder</span><span style=color:#f92672>().</span>
+                                      <span style=color:#f92672>.</span><span style=color:#a6e22e>setAccountNumber</span><span style=color:#f92672>(</span>804L<span style=color:#f92672>)</span>
+                                      <span style=color:#f92672>.</span><span style=color:#a6e22e>setOWner</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Joe Schmo&#34;</span><span style=color:#f92672>)</span>
+                                      <span style=color:#f92672>.</span><span style=color:#a6e22e>setInterestRate</span><span style=color:#f92672>(</span>3<span style=color:#f92672>.</span><span style=color:#a6e22e>2</span><span style=color:#f92672>)</span>
+                                      <span style=color:#f92672>.</span><span style=color:#a6e22e>setBranch</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Somewhere&#34;</span><span style=color:#f92672>)</span>
+                                      <span style=color:#f92672>.</span><span style=color:#a6e22e>setBalance</span><span style=color:#f92672>(</span>1000<span style=color:#f92672>.</span><span style=color:#a6e22e>00</span><span style=color:#f92672>)</span>
+                                      <span style=color:#f92672>.</span><span style=color:#a6e22e>build</span><span style=color:#f92672>();</span>
+
+</code></pre></div><p>You may be thinking.. but we <strong>still</strong> had to remember the order of arguments within
+the builder class. Yes, that&rsquo;s true but only once. After we create the builder, we
+no longer need to remember the order of arguments because that is encapsulated within
+the <code>build()</code> method of the builder. One of the other great advantages is that
+it&rsquo;s easy to see what each value represents when we use a builder to create objects.
+One could argue it&rsquo;s too verbose and while that may be true I&rsquo;d argue that the clarity it brings to the code out weighs verbosity.</p><p>To keep the theme rolling, stay tuned for a post on the factory method pattern.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-04-11-builder.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-12-uml/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Easing into UML</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-04-05-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Composite Pattern</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#skills>Skills</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
