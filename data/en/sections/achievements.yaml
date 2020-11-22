@@ -1,0 +1,11 @@
+section:
+  name: Achievements
+  id: achievements
+  enable: false
+  weight: 6
+  showOnNavbar: true
+
+achievements:
+- title: AWS Certified Solutions Architect
+  image: /images/icons/aws2.png
+  summary: talk about stuff here

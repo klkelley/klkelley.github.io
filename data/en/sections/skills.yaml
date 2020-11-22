@@ -5,23 +5,24 @@ section:
   enable: true
   weight: 2
   showOnNavbar: true
-  # Can optionally hide the title in sections
-  # hideTitle: true
 
-# Your Skills.
-# Give a summary of you each skill in the summary section.
 skills:
 - name: Elixir
   icon: "/images/icons/elixir.jpg"
-  summary: "This website is under construction!"
+  summary: "Used extensively in both greenfield and legacy application development. Have experience with gRPC & HTTP microservices as well as monoliths."
   url: "https://elixir-lang.org/"
 
 - name: Scala
   icon: "/images/icons/scala.png"
-  summary: "This website is under construction!"
+  summary: "Experience developing applications in a microservice oriented architecture. Also have used Scala in conjunction with the Lightbend stack including Akka HTTP and Play"
   url: "https://www.scala-lang.org/"
 
-- name: Phoenix Framework
+- name: Phoenix
   icon: "/images/icons/phoenix.png"
-  summary: "This website is under construction!"
+  summary: "Used Phoenix for web application development and have experience with LiveView"
+  url: "https://www.phoenixframework.org/"
+
+- name: Test-Driven Development
+  icon: "/images/icons/tdd.png"
+  summary: "Utilize TDD techniques for all development to provide reliable, well-crafted software"
   url: "https://www.phoenixframework.org/"
