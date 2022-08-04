@@ -2,7 +2,7 @@
 section:
   name: Skills
   id: skills
-  enable: false
+  enable: true
   weight: 2
   showOnNavbar: true
 
@@ -16,6 +16,10 @@ skills:
   icon: "/images/icons/scala.png"
   summary: "Experience developing applications in a microservice oriented architecture. Also have used Scala in conjunction with the Lightbend stack including Akka HTTP and Play"
   url: "https://www.scala-lang.org/"
+
+- name: Kubernetes & Docker
+  icon: "/images/icons/k8s.png"
+  summary: "Migrated several legacy applications to Kubernetes utilitizing Docker to containerize applications"
 
 - name: Phoenix
   icon: "/images/icons/phoenix.png"
