@@ -3,47 +3,55 @@
 <a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Kara Kelley</a>
 <button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
 <span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
-<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>March 21, 2017</p></div><div class=title><h1>Local Variable Scope</h1></div><div class=post-content id=post-content><p>There are many different types of variables in Ruby but for the purposes of this post I will only be addressing local variables and the concept of <em>scope</em> in regards to accessing local variables.</p><p>A variable&rsquo;s scope determines where in the program that variable is available for use. The scope is defined by where the variable is initialized.</p><p>Two common areas where we encounter variable scoping rules are in <em>blocks</em> and <em>methods</em>.</p><p>A block is a piece of code followed by a method invocation by using either <code>do...end</code> or <code>{ }</code>. As stated earlier, variable scope is determined by where it is initialized. Variables initialized in the outer scope can be accessed in the inner scope, but not vice versa.</p><p><strong>Accessing Variables in Blocks</strong></p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby>a <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>             <span style=color:#75715e># outer scope variable initialized</span>
-
-<span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>           <span style=color:#75715e># the block creates an inner scope</span>
-  a <span style=color:#f92672>=</span> a <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>       <span style=color:#75715e># the value of a has been reassigned to 2</span>
-  <span style=color:#66d9ef>break</span>           
-<span style=color:#66d9ef>end</span>
-
-puts a            <span style=color:#75715e># =&gt; 2</span>
-</code></pre></div><p>Because <code>a</code> was initialized before the block we were able to access it within the block, reassign it and have access to its new value outside the block.</p><p>On the flip side, if we hadn&rsquo;t initialized <code>a</code> like the following example we would see an error like this:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>
-  a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;dog&#34;</span>       <span style=color:#75715e># &#39;a&#39; is initialized inside the block</span>
-  puts a          <span style=color:#75715e># =&gt; &#39;dog&#39;</span>
-  <span style=color:#66d9ef>break</span>
-<span style=color:#66d9ef>end</span>
-
-puts a      
-<span style=color:#75715e># =&gt; NameError: undefined local variable or method `a&#39; for main:Object</span>
-</code></pre></div><p>Because <code>a</code> was created in the inner scope of the block it is not accessible in the outer scope, thus we received an error. In order to have access to variables in the outer scope of a block, they need to be initialized first.
-It should also be noted you cannot reference variables initialized in other blocks as shown below.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>
-  a <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>         <span style=color:#75715e># &#39;a&#39; initialized and assigned to 1</span>
-  puts a        <span style=color:#75715e># =&gt; 1</span>
-  <span style=color:#66d9ef>break</span>
-<span style=color:#66d9ef>end</span>
-
-<span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>
-  puts a       <span style=color:#75715e># =&gt; NameError: undefined local variable or method `a&#39; for main:Object</span>
-  <span style=color:#66d9ef>break</span>
-<span style=color:#66d9ef>end</span>
-</code></pre></div><p><strong>Local Variables & Methods</strong></p><p>Methods (in regards to local variables) have no notion of &ldquo;inner&rdquo; and &ldquo;outer&rdquo; scope. In order for a method to have access to local variables they must be passed in to the method.</p><p>Here is what happens when we try to access a variable without passing it into the method.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby>num <span style=color:#f92672>=</span> <span style=color:#ae81ff>4</span>
-
-<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>display_number</span>
-  puts num
-<span style=color:#66d9ef>end</span>
-
-display_number    <span style=color:#75715e># =&gt; prac1.rb:4:in `display_number&#39;: undefined local variable or method `num&#39; for main:Object (NameError)</span>
-</code></pre></div><p>On the other hand, if we properly pass in the variable to the method then it will be available to the method.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby>num <span style=color:#f92672>=</span> <span style=color:#ae81ff>4</span>
-
-<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>display_number</span>(param)
-  puts param
-<span style=color:#66d9ef>end</span>
-
-display_number(num)       <span style=color:#75715e># =&gt; 4</span>
-</code></pre></div><p>Of course, all this only applies to local variables and however it is important to know how local variable scoping rules work when learning Ruby.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2017-03-20-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2017-04-03-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Each, Map, & Select</span></a></div><div class="col-md-6 next-article"><a href=/posts/2017-01-08-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Intro to Ruby Collections</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>March 21, 2017</p></div><div class=title><h1>Local Variable Scope</h1></div><div class=post-content id=post-content><p>There are many different types of variables in Ruby but for the purposes of this post I will only be addressing local variables and the concept of <em>scope</em> in regards to accessing local variables.</p><p>A variable&rsquo;s scope determines where in the program that variable is available for use. The scope is defined by where the variable is initialized.</p><p>Two common areas where we encounter variable scoping rules are in <em>blocks</em> and <em>methods</em>.</p><p>A block is a piece of code followed by a method invocation by using either <code>do...end</code> or <code>{ }</code>. As stated earlier, variable scope is determined by where it is initialized. Variables initialized in the outer scope can be accessed in the inner scope, but not vice versa.</p><p><strong>Accessing Variables in Blocks</strong></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span>a <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>             <span style=color:#75715e># outer scope variable initialized</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>           <span style=color:#75715e># the block creates an inner scope</span>
+</span></span><span style=display:flex><span>  a <span style=color:#f92672>=</span> a <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>       <span style=color:#75715e># the value of a has been reassigned to 2</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>break</span>           
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>puts a            <span style=color:#75715e># =&gt; 2</span>
+</span></span></code></pre></div><p>Because <code>a</code> was initialized before the block we were able to access it within the block, reassign it and have access to its new value outside the block.</p><p>On the flip side, if we hadn&rsquo;t initialized <code>a</code> like the following example we would see an error like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>
+</span></span><span style=display:flex><span>  a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;dog&#34;</span>       <span style=color:#75715e># &#39;a&#39; is initialized inside the block</span>
+</span></span><span style=display:flex><span>  puts a          <span style=color:#75715e># =&gt; &#39;dog&#39;</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>puts a      
+</span></span><span style=display:flex><span><span style=color:#75715e># =&gt; NameError: undefined local variable or method `a&#39; for main:Object</span>
+</span></span></code></pre></div><p>Because <code>a</code> was created in the inner scope of the block it is not accessible in the outer scope, thus we received an error. In order to have access to variables in the outer scope of a block, they need to be initialized first.
+It should also be noted you cannot reference variables initialized in other blocks as shown below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span><span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>
+</span></span><span style=display:flex><span>  a <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>         <span style=color:#75715e># &#39;a&#39; initialized and assigned to 1</span>
+</span></span><span style=display:flex><span>  puts a        <span style=color:#75715e># =&gt; 1</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>loop</span> <span style=color:#66d9ef>do</span>
+</span></span><span style=display:flex><span>  puts a       <span style=color:#75715e># =&gt; NameError: undefined local variable or method `a&#39; for main:Object</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span></code></pre></div><p><strong>Local Variables & Methods</strong></p><p>Methods (in regards to local variables) have no notion of &ldquo;inner&rdquo; and &ldquo;outer&rdquo; scope. In order for a method to have access to local variables they must be passed in to the method.</p><p>Here is what happens when we try to access a variable without passing it into the method.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span>num <span style=color:#f92672>=</span> <span style=color:#ae81ff>4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>display_number</span>
+</span></span><span style=display:flex><span>  puts num
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>display_number    <span style=color:#75715e># =&gt; prac1.rb:4:in `display_number&#39;: undefined local variable or method `num&#39; for main:Object (NameError)</span>
+</span></span></code></pre></div><p>On the other hand, if we properly pass in the variable to the method then it will be available to the method.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=display:flex><span>num <span style=color:#f92672>=</span> <span style=color:#ae81ff>4</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>display_number</span>(param)
+</span></span><span style=display:flex><span>  puts param
+</span></span><span style=display:flex><span><span style=color:#66d9ef>end</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>display_number(num)       <span style=color:#75715e># =&gt; 4</span>
+</span></span></code></pre></div><p>Of course, all this only applies to local variables and however it is important to know how local variable scoping rules work when learning Ruby.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2017-03-20-title.markdown><i class="fas fa-code-branch"></i>
+Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2017-04-03-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i> Prev</span><br><span>Each, Map, & Select</span></a></div><div class="col-md-6 next-article"><a href=/posts/2017-01-08-title/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Intro to Ruby Collections</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
 Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
-<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script>
+<script src=/assets/js/popper.min.js></script>
+<script src=/assets/js/bootstrap.min.js></script>
+<script src=/assets/js/navbar.js></script>
+<script src=/assets/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script>
+<script src=/assets/js/single.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

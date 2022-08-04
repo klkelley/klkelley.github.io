@@ -12,78 +12,81 @@ application&rsquo;s code.</p><p>You may think that inheritance could be a good a
 but we can&rsquo;t use inheritance to add or remove behavior at runtime with inheritance. This
 is where the decorator pattern comes into play.</p><p>Typically, there are four components to the decorator pattern:</p><ul><li>Component - The component is the interface for objects that can have responsibilities added to them dynamically.</li><li>Concrete Component - Defines an objects to which additional responsibilities can be added</li><li>Decorator - Maintains a reference to a Component object and defines an interface that conforms to the Component&rsquo;s interface.</li><li>Concrete Decorators - Extend the functionality of the component by adding behavior.</li></ul><p>Here is a UML diagram illustrating the pattern with the different components</p><p><img src=http://best-practice-software-engineering.ifs.tuwien.ac.at/patterns/images/decorator_simple.jpg alt=uml-decorator></p><p>Now that we have some base knowledge on the intent and the different participants that make up the decorator pattern let&rsquo;s check out an example.</p><p>Consider that we want to implement different types of cars. We could implement a <code>Car</code> interface
 and create a <code>StandardCar</code> and have other types of cars like <code>LuxuryCars</code> and <code>SportsCar</code> extend
-<code>StandardCar</code> but what if we wanted to have a car that had features of both types of cars at runtime. This wouldn&rsquo;t be quite possible and if we stick with this inheritance model the amount of subclasses for all the different types of cars and their features would be immense.</p><p>Instead, we can use the decorator pattern to solve this problem.</p><p>Our <strong>component</strong> can be either and interface or abstract class but we&rsquo;ll stick with an interface for this example.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Car</span> <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>The <strong>concrete component</strong> would then look something like this:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>StandardCar</span> <span style=color:#66d9ef>implements</span> Car <span style=color:#f92672>{</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Standard Car.&#34;</span><span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>The <strong>decorator</strong> would be modeled as follows:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CarDecorator</span> <span style=color:#66d9ef>implements</span> Car <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>private</span> Car car<span style=color:#f92672>;</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>CarDecorator</span><span style=color:#f92672>(</span>Car car<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>car</span> <span style=color:#f92672>=</span> car<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>car</span><span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>Now we&rsquo;re ready for our <strong>concrete decorators</strong> like <code>LuxuryCar</code> and <code>SportsCar</code></p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SportsCar</span> <span style=color:#66d9ef>extends</span> CarDecorator <span style=color:#f92672>{</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>SportsCar</span><span style=color:#f92672>(</span>Car car<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>super</span><span style=color:#f92672>(</span>car<span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Adding cool sports car features&#34;</span><span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>LuxuryCar</span> <span style=color:#66d9ef>extends</span> CarDecorator <span style=color:#f92672>{</span>
-
-  <span style=color:#66d9ef>public</span> LuxuryCar <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>CarDecorator</span><span style=color:#f92672>(</span>Car car<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>super</span><span style=color:#f92672>(</span>car<span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Adding fancy luxury car features&#34;</span><span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>Now we can create all types of cars.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Main</span> <span style=color:#f92672>{</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    Car sportsCar <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> SportsCar<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> StandardCar<span style=color:#f92672>());</span>
-    sportsCar<span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
-
-    Car sportsLuxuryCar <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> SportsCar<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> LuxuryCar<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> StandardCar<span style=color:#f92672>()));</span>
-    sportsLuxuryCar<span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-
-<span style=color:#75715e>// =&gt; Standard Car. Adding cool sports car features.
-</span><span style=color:#75715e>// =&gt; Standard Car. Adding fancy luxury car features. Adding cool sports car features. 
-</span><span style=color:#75715e></span>
-</code></pre></div><p>So, in summary, this pattern is really helpful when you need to provide runtime modifications. It&rsquo;s also much easier to maintain vs having an unlimited number of subclasses. I also liked this analogy if you&rsquo;re familiar with the strategy pattern:</p><blockquote><p>Decorator lets you change the skin of an objects. Strategy lets you change the guts. Lastly, if you want to see a non-contrived example implementing the decorator pattern, check out the <code>HandlerWrapper</code> class in the <code>Jetty.server</code> library.</p></blockquote></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-05-07-decorator.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-05-15-cors/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>CORS</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-05-01-jetty/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Jetty Server and HTTP Libraries</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+<code>StandardCar</code> but what if we wanted to have a car that had features of both types of cars at runtime. This wouldn&rsquo;t be quite possible and if we stick with this inheritance model the amount of subclasses for all the different types of cars and their features would be immense.</p><p>Instead, we can use the decorator pattern to solve this problem.</p><p>Our <strong>component</strong> can be either and interface or abstract class but we&rsquo;ll stick with an interface for this example.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>Car</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>The <strong>concrete component</strong> would then look something like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>StandardCar</span> <span style=color:#66d9ef>implements</span> Car <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Standard Car.&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>The <strong>decorator</strong> would be modeled as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>CarDecorator</span> <span style=color:#66d9ef>implements</span> Car <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> Car car<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>CarDecorator</span><span style=color:#f92672>(</span>Car car<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>car</span> <span style=color:#f92672>=</span> car<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>car</span><span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>Now we&rsquo;re ready for our <strong>concrete decorators</strong> like <code>LuxuryCar</code> and <code>SportsCar</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SportsCar</span> <span style=color:#66d9ef>extends</span> CarDecorator <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>SportsCar</span><span style=color:#f92672>(</span>Car car<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>super</span><span style=color:#f92672>(</span>car<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Adding cool sports car features&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>LuxuryCar</span> <span style=color:#66d9ef>extends</span> CarDecorator <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> LuxuryCar <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>CarDecorator</span><span style=color:#f92672>(</span>Car car<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>super</span><span style=color:#f92672>(</span>car<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>makeCar</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>super</span><span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Adding fancy luxury car features&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>Now we can create all types of cars.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Main</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    Car sportsCar <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> SportsCar<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> StandardCar<span style=color:#f92672>());</span>
+</span></span><span style=display:flex><span>    sportsCar<span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Car sportsLuxuryCar <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> SportsCar<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> LuxuryCar<span style=color:#f92672>(</span><span style=color:#66d9ef>new</span> StandardCar<span style=color:#f92672>()));</span>
+</span></span><span style=display:flex><span>    sportsLuxuryCar<span style=color:#f92672>.</span><span style=color:#a6e22e>makeCar</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// =&gt; Standard Car. Adding cool sports car features.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// =&gt; Standard Car. Adding fancy luxury car features. Adding cool sports car features. 
+</span></span></span></code></pre></div><p>So, in summary, this pattern is really helpful when you need to provide runtime modifications. It&rsquo;s also much easier to maintain vs having an unlimited number of subclasses. I also liked this analogy if you&rsquo;re familiar with the strategy pattern:</p><blockquote><p>Decorator lets you change the skin of an objects. Strategy lets you change the guts. Lastly, if you want to see a non-contrived example implementing the decorator pattern, check out the <code>HandlerWrapper</code> class in the <code>Jetty.server</code> library.</p></blockquote></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-05-07-decorator.markdown><i class="fas fa-code-branch"></i>
+Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-05-15-cors/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i> Prev</span><br><span>CORS</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-05-01-jetty/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Jetty Server and HTTP Libraries</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
 Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
-<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script>
+<script src=/assets/js/popper.min.js></script>
+<script src=/assets/js/bootstrap.min.js></script>
+<script src=/assets/js/navbar.js></script>
+<script src=/assets/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script>
+<script src=/assets/js/single.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

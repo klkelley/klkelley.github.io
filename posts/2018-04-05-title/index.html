@@ -11,138 +11,141 @@ departments. How do we find the salary of each department? It&rsquo;s the salary
 the department heads + the salary of managers. How do we find the salary of all
 the managers? It&rsquo;s the salary of the managers + the salary of their subordinates.
 This can go on and on.</p><p>We&rsquo;ll try our hand at some code using a smaller organization though. We want
-to get the salary of all employees from top to bottom.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Employee</span> <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> UnsupportedOperationException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Cannot add new employee.&#34;</span><span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>remove</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> UnsupportedOperationException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Cannot remove an employee.&#34;</span><span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>double</span> <span style=color:#a6e22e>getSalary</span><span style=color:#f92672>();</span> 
-  <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>getName</span><span style=color:#f92672>();</span> 
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>print</span><span style=color:#f92672>();</span> 
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>Our abstract class <code>Employee</code> is our <strong>Component</strong>. You&rsquo;ll notice that
+to get the salary of all employees from top to bottom.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Employee</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> UnsupportedOperationException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Cannot add new employee.&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>remove</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> UnsupportedOperationException<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Cannot remove an employee.&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>double</span> <span style=color:#a6e22e>getSalary</span><span style=color:#f92672>();</span> 
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>getName</span><span style=color:#f92672>();</span> 
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>print</span><span style=color:#f92672>();</span> 
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>Our abstract class <code>Employee</code> is our <strong>Component</strong>. You&rsquo;ll notice that
 <code>add</code> and <code>remove</code> throw exceptions by default. This is because
 this behavior is irrelevant to our leafs and it some code accidentally
-calls these methods on a leaf an exception will be raised.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Manager</span> <span style=color:#66d9ef>extends</span> Employee <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>;</span> 
-  <span style=color:#66d9ef>private</span> String name<span style=color:#f92672>;</span>
-  <span style=color:#66d9ef>private</span> List<span style=color:#f92672>&lt;</span>Employee<span style=color:#f92672>&gt;</span> employees <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ArrayList<span style=color:#f92672>&lt;&gt;();</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Manager</span><span style=color:#f92672>(</span>String name<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> name<span style=color:#f92672>;</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>salary</span> <span style=color:#f92672>=</span> salary<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>remove</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    employees<span style=color:#f92672>.</span><span style=color:#a6e22e>remove</span><span style=color:#f92672>(</span>employee<span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    employees<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee<span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>getName</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>return</span> name<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>double</span> <span style=color:#a6e22e>getSalary</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>return</span> salary<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>print</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-------------&#34;</span><span style=color:#f92672>);</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Name =&#34;</span><span style=color:#f92672>+</span>getName<span style=color:#f92672>());</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Salary =&#34;</span><span style=color:#f92672>+</span>getSalary<span style=color:#f92672>());</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-------------&#34;</span><span style=color:#f92672>);</span>
-
-    <span style=color:#66d9ef>for</span> <span style=color:#f92672>(</span>Employee employee <span style=color:#f92672>:</span> employees<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-      employee<span style=color:#f92672>.</span><span style=color:#a6e22e>print</span><span style=color:#f92672>();</span>
-    <span style=color:#f92672>}</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>Our <code>Manager</code> class is our <strong>composite</strong>.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Developer</span> <span style=color:#66d9ef>extends</span> Employee <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>private</span> String name<span style=color:#f92672>;</span>
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>;</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Developer</span><span style=color:#f92672>(</span>String name<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> name<span style=color:#f92672>;</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>salary</span> <span style=color:#f92672>=</span> salary<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>getName</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>return</span> name<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>double</span> <span style=color:#a6e22e>getSalary</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>return</span> salary<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>print</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-----------&#34;</span><span style=color:#f92672>);</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Name: &#34;</span> <span style=color:#f92672>+</span> getName<span style=color:#f92672>());</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Salary: &#34;</span><span style=color:#f92672>+</span> getSalary<span style=color:#f92672>());</span>
-    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-----------&#34;</span><span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>The developer class is a <strong>leaf</strong> and since it&rsquo;s a leaf, we don&rsquo;t have to worry about
-children. This is why the <code>Developer</code> class only provides implementation for <code>getName</code>, <code>getSalary</code> and <code>print</code>.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Company</span> <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span> <span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    Employee employee1 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Developer<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Kara&#34;</span><span style=color:#f92672>,</span> 100000<span style=color:#f92672>);</span>
-    Employee employee2 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Developer<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Mike&#34;</span><span style=color:#f92672>,</span> 100000<span style=color:#f92672>);</span>
-    Employee employee3 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Developer<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Aaron&#34;</span><span style=color:#f92672>,</span> 100000<span style=color:#f92672>);</span>
-    Employee manager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Manager<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Someone&#34;</span><span style=color:#f92672>,</span> 150000<span style=color:#f92672>);</span>
-    manager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee1<span style=color:#f92672>);</span>
-    manager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee2<span style=color:#f92672>);</span>
-    Manager generalManager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Manager<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Someone Else&#34;</span><span style=color:#f92672>,</span> 150000<span style=color:#f92672>);</span>
-    generalManager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee3<span style=color:#f92672>);</span>
-    generalManager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>manager<span style=color:#f92672>);</span>
-
-    generalManager<span style=color:#f92672>.</span><span style=color:#a6e22e>print</span><span style=color:#f92672>();</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-
-<span style=color:#f92672>-------------</span>
-Name: Someone Else
-Salary: 150000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
-<span style=color:#f92672>-------------</span>
-<span style=color:#f92672>-----------</span>
-Name: Aaron
-Salary: 100000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
-<span style=color:#f92672>-----------</span>
-<span style=color:#f92672>-------------</span>
-Name: Someone
-Salary: 150000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
-<span style=color:#f92672>-------------</span>
-<span style=color:#f92672>-----------</span>
-Name: Kara
-Salary: 100000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
-<span style=color:#f92672>-----------</span>
-<span style=color:#f92672>-----------</span>
-Name: Mike
-Salary: 100000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
-<span style=color:#f92672>-----------</span>
-
-
-</code></pre></div><p>So when we create some employees and managers for our company. We can ask the
+calls these methods on a leaf an exception will be raised.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Manager</span> <span style=color:#66d9ef>extends</span> Employee <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>;</span> 
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> String name<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> List<span style=color:#f92672>&lt;</span>Employee<span style=color:#f92672>&gt;</span> employees <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> ArrayList<span style=color:#f92672>&lt;&gt;();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Manager</span><span style=color:#f92672>(</span>String name<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> name<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>salary</span> <span style=color:#f92672>=</span> salary<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>remove</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    employees<span style=color:#f92672>.</span><span style=color:#a6e22e>remove</span><span style=color:#f92672>(</span>employee<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>Employee employee<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    employees<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>getName</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> name<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>double</span> <span style=color:#a6e22e>getSalary</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> salary<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>print</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-------------&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Name =&#34;</span><span style=color:#f92672>+</span>getName<span style=color:#f92672>());</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Salary =&#34;</span><span style=color:#f92672>+</span>getSalary<span style=color:#f92672>());</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-------------&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> <span style=color:#f92672>(</span>Employee employee <span style=color:#f92672>:</span> employees<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>      employee<span style=color:#f92672>.</span><span style=color:#a6e22e>print</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>Our <code>Manager</code> class is our <strong>composite</strong>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Developer</span> <span style=color:#66d9ef>extends</span> Employee <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> String name<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Developer</span><span style=color:#f92672>(</span>String name<span style=color:#f92672>,</span> <span style=color:#66d9ef>double</span> salary<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> name<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>salary</span> <span style=color:#f92672>=</span> salary<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> String <span style=color:#a6e22e>getName</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> name<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>double</span> <span style=color:#a6e22e>getSalary</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> salary<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>print</span><span style=color:#f92672>()</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-----------&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Name: &#34;</span> <span style=color:#f92672>+</span> getName<span style=color:#f92672>());</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Salary: &#34;</span><span style=color:#f92672>+</span> getSalary<span style=color:#f92672>());</span>
+</span></span><span style=display:flex><span>    System<span style=color:#f92672>.</span><span style=color:#a6e22e>out</span><span style=color:#f92672>.</span><span style=color:#a6e22e>println</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;-----------&#34;</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>The developer class is a <strong>leaf</strong> and since it&rsquo;s a leaf, we don&rsquo;t have to worry about
+children. This is why the <code>Developer</code> class only provides implementation for <code>getName</code>, <code>getSalary</code> and <code>print</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Company</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span> <span style=color:#f92672>(</span>String<span style=color:#f92672>[]</span> args<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    Employee employee1 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Developer<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Kara&#34;</span><span style=color:#f92672>,</span> 100000<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    Employee employee2 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Developer<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Mike&#34;</span><span style=color:#f92672>,</span> 100000<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    Employee employee3 <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Developer<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Aaron&#34;</span><span style=color:#f92672>,</span> 100000<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    Employee manager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Manager<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Someone&#34;</span><span style=color:#f92672>,</span> 150000<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    manager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee1<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    manager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee2<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    Manager generalManager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Manager<span style=color:#f92672>(</span><span style=color:#e6db74>&#34;Someone Else&#34;</span><span style=color:#f92672>,</span> 150000<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    generalManager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>employee3<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    generalManager<span style=color:#f92672>.</span><span style=color:#a6e22e>add</span><span style=color:#f92672>(</span>manager<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    generalManager<span style=color:#f92672>.</span><span style=color:#a6e22e>print</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-------------</span>
+</span></span><span style=display:flex><span>Name: Someone Else
+</span></span><span style=display:flex><span>Salary: 150000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-------------</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------</span>
+</span></span><span style=display:flex><span>Name: Aaron
+</span></span><span style=display:flex><span>Salary: 100000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-------------</span>
+</span></span><span style=display:flex><span>Name: Someone
+</span></span><span style=display:flex><span>Salary: 150000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-------------</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------</span>
+</span></span><span style=display:flex><span>Name: Kara
+</span></span><span style=display:flex><span>Salary: 100000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------</span>
+</span></span><span style=display:flex><span>Name: Mike
+</span></span><span style=display:flex><span>Salary: 100000<span style=color:#f92672>.</span><span style=color:#a6e22e>0</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>-----------</span>
+</span></span></code></pre></div><p>So when we create some employees and managers for our company. We can ask the
 highest ranking manager (i.e. <code>generalManager</code>) to get the names and salaries
 of all employees. This process continues until it reaches just the leaves as
 we explained in the initial example above.</p><p>One of the things I don&rsquo;t particularly like about this pattern is that if you
 use interfaces or even abstract classes, the leaf class has to either provide an
 empty implementation of some methods (violation of the Interface Segregation Principle) or rely on a default implementation (in our case
 this was an exception being thrown). It just seems a bit like a code smell
-but overall, this pattern is pretty cool.</p><p>That&rsquo;s wrap on composite patterns but I have a strong feeling the following post will be about another design pattern as well, stay tuned.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-04-05-title.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-11-builder/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Builder Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-04-03-proxy/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Proxy Pattern</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+but overall, this pattern is pretty cool.</p><p>That&rsquo;s wrap on composite patterns but I have a strong feeling the following post will be about another design pattern as well, stay tuned.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-04-05-title.markdown><i class="fas fa-code-branch"></i>
+Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-11-builder/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i> Prev</span><br><span>Builder Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-04-03-proxy/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Proxy Pattern</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
 Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
-<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script>
+<script src=/assets/js/popper.min.js></script>
+<script src=/assets/js/bootstrap.min.js></script>
+<script src=/assets/js/navbar.js></script>
+<script src=/assets/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script>
+<script src=/assets/js/single.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

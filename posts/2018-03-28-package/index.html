@@ -5,38 +5,38 @@
 <span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
 <img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><a href=/posts/fp-oop/>FP & OOP</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(/assets/images/default-hero.jpg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/author/kara.jpg><h5 class=author-name>Kara Kelley</h5><p>March 28, 2018</p></div><div class=title><h1>Package Principles</h1></div><div class=post-content id=post-content><p>This post will be focused on how my current HTTP server project either adheres or violates
 certain package principles. I will discuss all the principles including their definitions
-and compare my current project&rsquo;s package structure.</p><blockquote><p>Package principles are a way of organizing classes in larger systems to make them more organized and manageable. They help to understand which classes should go into which packages (i.e. cohesion) and how these packages should relate with one another (i.e. coupling).</p></blockquote><p>At the time of this writing, here is the structure of my current project:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>└── karakelley
-    └── http
-        ├── ContentGeneration
-        │   ├── ContentGenerator.java
-        │   └── HtmlGenerator.java
-        ├── FileSystem
-        │   ├── FileFinder.java
-        │   ├── FileFinderCache.java
-        │   ├── PublicDirectory.java
-        │   └── RealFileFinder.java
-        ├── HttpServer.java
-        ├── Main.java
-        ├── Request.java
-        ├── Response.java
-        ├── ServerConfiguration.java
-        ├── Status.java
-        ├── controllers
-        │   ├── Application.java
-        │   ├── Controller.java
-        │   ├── HelloWorldController.java
-        │   ├── InvalidRequestController.java
-        │   ├── RedirectController.java
-        │   ├── Router.java
-        │   └── StaticFilesController.java
-        └── utility
-            ├── BufferedLineReader.java
-            ├── CommandLineArguments.java
-            ├── Exit.java
-            ├── InMemoryAppender.java
-            ├── LineReader.java
-            └── SystemExit.java
-</code></pre></div><p>The packages I have at the moment are <code>http</code>, <code>ContentGeneration</code>, <code>FileSystem</code>, <code>Controllers</code>, and
+and compare my current project&rsquo;s package structure.</p><blockquote><p>Package principles are a way of organizing classes in larger systems to make them more organized and manageable. They help to understand which classes should go into which packages (i.e. cohesion) and how these packages should relate with one another (i.e. coupling).</p></blockquote><p>At the time of this writing, here is the structure of my current project:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>└── karakelley
+</span></span><span style=display:flex><span>    └── http
+</span></span><span style=display:flex><span>        ├── ContentGeneration
+</span></span><span style=display:flex><span>        │   ├── ContentGenerator.java
+</span></span><span style=display:flex><span>        │   └── HtmlGenerator.java
+</span></span><span style=display:flex><span>        ├── FileSystem
+</span></span><span style=display:flex><span>        │   ├── FileFinder.java
+</span></span><span style=display:flex><span>        │   ├── FileFinderCache.java
+</span></span><span style=display:flex><span>        │   ├── PublicDirectory.java
+</span></span><span style=display:flex><span>        │   └── RealFileFinder.java
+</span></span><span style=display:flex><span>        ├── HttpServer.java
+</span></span><span style=display:flex><span>        ├── Main.java
+</span></span><span style=display:flex><span>        ├── Request.java
+</span></span><span style=display:flex><span>        ├── Response.java
+</span></span><span style=display:flex><span>        ├── ServerConfiguration.java
+</span></span><span style=display:flex><span>        ├── Status.java
+</span></span><span style=display:flex><span>        ├── controllers
+</span></span><span style=display:flex><span>        │   ├── Application.java
+</span></span><span style=display:flex><span>        │   ├── Controller.java
+</span></span><span style=display:flex><span>        │   ├── HelloWorldController.java
+</span></span><span style=display:flex><span>        │   ├── InvalidRequestController.java
+</span></span><span style=display:flex><span>        │   ├── RedirectController.java
+</span></span><span style=display:flex><span>        │   ├── Router.java
+</span></span><span style=display:flex><span>        │   └── StaticFilesController.java
+</span></span><span style=display:flex><span>        └── utility
+</span></span><span style=display:flex><span>            ├── BufferedLineReader.java
+</span></span><span style=display:flex><span>            ├── CommandLineArguments.java
+</span></span><span style=display:flex><span>            ├── Exit.java
+</span></span><span style=display:flex><span>            ├── InMemoryAppender.java
+</span></span><span style=display:flex><span>            ├── LineReader.java
+</span></span><span style=display:flex><span>            └── SystemExit.java
+</span></span></code></pre></div><p>The packages I have at the moment are <code>http</code>, <code>ContentGeneration</code>, <code>FileSystem</code>, <code>Controllers</code>, and
 <code>Utility</code>.</p><h4 id=granularity-the-principles-of-package-cohesion><strong>Granularity: The Principles of Package Cohesion</strong></h4><p><strong>The Reuse-Release Equivalence Principle (REP):</strong></p><p>REP means that the package must be created with reusable classes. In other words, Either all of the
 classes inside the package are reusable or none of them are. The classes must also be of the
 same family which means that classes that are unrelated to the purpose of the package should not
@@ -55,7 +55,7 @@ an application dependent on a number of packages, ideally you&rsquo;d only want 
 rather than in a number of them. This helps to identify classes that are likely to change, and package
 them together for the same reasons. In other words, if classes are tightly coupled, they belong in the
 same package</p><p>The glaring violator here, again, is the <code>Utility</code> package. These classes are not tightly bound to each
-other and this package has many reasons to change. I do, however, think that the <code>Controllers</code>, <code>FileSystem</code>, and <code>ContentGeneration</code> are adhering to this principle in the sense that they would change
+other and this package has many reasons to change. I do, however, think that the <code>Controllers</code>, <code>FileSystem </code>, and <code>ContentGeneration</code> are adhering to this principle in the sense that they would change
 for the same reasons.</p><h4 id=stability-the-principles-of-package-coupling><strong>Stability: The Principles of Package Coupling</strong></h4><p><strong>The Acyclic-Dependencies Principle (ADP):</strong></p><p>ADP states that &ldquo;the dependency graph of packages or components should have no cycles&rdquo;. In other words,
 there should be no circular dependencies between packages. When you have cyclic dependencies, a change to
 any packages triggers an update in every package. When you have cyclic dependencies, you lose
@@ -76,6 +76,14 @@ classes) into the same package and it&rsquo;s something I need to be more cogniz
 into their own packages. 99% of the time I find more clarity in concepts after writing a blog post.
 I will admit that I definitely understand the 3 cohesion principles significantly better compared to
 when I read about them the first time in PPP. But, I still find the package coupling principles a little
-confusing. I hope with time and experience they will begin to make sense, in the way that the SOLID principles eventually clicked for me.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-03-28-package.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-03-proxy/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Proxy Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-03-26-web/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Web Abstractions</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents><ul><li><ul><li><ul><li><a href=#granularity-the-principles-of-package-cohesion><strong>Granularity: The Principles of Package Cohesion</strong></a></li><li><a href=#stability-the-principles-of-package-coupling><strong>Stability: The Principles of Package Coupling</strong></a></li><li><a href=#conclusion><strong>Conclusion</strong></a></li></ul></li></ul></li></ul></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+confusing. I hope with time and experience they will begin to make sense, in the way that the SOLID principles eventually clicked for me.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-03-28-package.markdown><i class="fas fa-code-branch"></i>
+Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-03-proxy/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i> Prev</span><br><span>Proxy Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-03-26-web/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Web Abstractions</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents><ul><li><ul><li><ul><li><a href=#granularity-the-principles-of-package-cohesion><strong>Granularity: The Principles of Package Cohesion</strong></a></li><li><a href=#stability-the-principles-of-package-coupling><strong>Stability: The Principles of Package Coupling</strong></a></li><li><a href=#conclusion><strong>Conclusion</strong></a></li></ul></li></ul></li></ul></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
 Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
-<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script>
+<script src=/assets/js/popper.min.js></script>
+<script src=/assets/js/bootstrap.min.js></script>
+<script src=/assets/js/navbar.js></script>
+<script src=/assets/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script>
+<script src=/assets/js/single.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

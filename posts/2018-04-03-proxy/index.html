@@ -34,51 +34,50 @@ certain websites. Only the websites and contents which are
 valid will be allowed and the rest will be blocked.</p><p>When I first read about the pattern and saw similar diagrams I understood the idea of relying
 on the interface and thought it looked very similar to some other patterns I&rsquo;ve read about like the Decorator pattern. What I still wondered about was what was the point of going through one object to get to another. What problem does that solve? No matter what, <em>eventually</em> you would need to check if the file existed on the server, right? How does using a &ldquo;pass through&rdquo; object solve anything?</p><p>Well, it turns out, using the proxy pattern in conjunction
 with caching is pretty common. Using the proxy pattern and caching results would allow me to
-avoid hitting IO every single time. Let&rsquo;s take a look at some code.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java>
-<span style=color:#66d9ef>class</span> <span style=color:#a6e22e>PublicDirectory</span>
- 
- <span style=color:#66d9ef>private</span> <span style=color:#a6e22e>PublicDirectory</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>,</span> FileFinder fileFinderCache<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>fileFinderCache</span> <span style=color:#f92672>=</span> fileFinderCache<span style=color:#f92672>;</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>documentRoot</span> <span style=color:#f92672>=</span> Paths<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>path<span style=color:#f92672>).</span><span style=color:#a6e22e>toFile</span><span style=color:#f92672>();</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>path</span> <span style=color:#f92672>=</span> path<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#75715e>// .. 
-</span><span style=color:#75715e></span>
-   <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>return</span> fileFinderCache<span style=color:#f92672>.</span><span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>documentRoot<span style=color:#f92672>+</span>path<span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-</code></pre></div><p>The <code>PublicDirectory</code> class takes an instance of
+avoid hitting IO every single time. Let&rsquo;s take a look at some code.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>PublicDirectory</span>
+</span></span><span style=display:flex><span> 
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>private</span> <span style=color:#a6e22e>PublicDirectory</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>,</span> FileFinder fileFinderCache<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>fileFinderCache</span> <span style=color:#f92672>=</span> fileFinderCache<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>documentRoot</span> <span style=color:#f92672>=</span> Paths<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>path<span style=color:#f92672>).</span><span style=color:#a6e22e>toFile</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>path</span> <span style=color:#f92672>=</span> path<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e>// .. 
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>   <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> fileFinderCache<span style=color:#f92672>.</span><span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>documentRoot<span style=color:#f92672>+</span>path<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p>The <code>PublicDirectory</code> class takes an instance of
 <code>FileFinderCache</code> which is the <strong>proxy</strong> class. When asked if a resource exists,
-it will delegate to the proxy (<code>fileFinderCache</code>).</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>FileFinderCache</span> <span style=color:#66d9ef>implements</span> FileFinder <span style=color:#f92672>{</span>
-  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>final</span> FileFinder fileFinder<span style=color:#f92672>;</span>
-  <span style=color:#66d9ef>private</span> Map<span style=color:#f92672>&lt;</span>String<span style=color:#f92672>,</span> Boolean<span style=color:#f92672>&gt;</span> cache <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> HashMap<span style=color:#f92672>();</span>
-
-  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>FileFinderCache</span><span style=color:#f92672>(</span>FileFinder fileFinder<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>fileFinder</span> <span style=color:#f92672>=</span> fileFinder<span style=color:#f92672>;</span>
-  <span style=color:#f92672>}</span>
-
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    Boolean requestedFiles <span style=color:#f92672>=</span> cache<span style=color:#f92672>.</span><span style=color:#a6e22e>getOrDefault</span><span style=color:#f92672>(</span>path<span style=color:#f92672>,</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>);</span>
-    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>requestedFiles <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-      cache<span style=color:#f92672>.</span><span style=color:#a6e22e>put</span><span style=color:#f92672>(</span>path<span style=color:#f92672>,</span> fileFinder<span style=color:#f92672>.</span><span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>path<span style=color:#f92672>));</span>
-    <span style=color:#f92672>}</span>
-    <span style=color:#66d9ef>return</span> cache<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>path<span style=color:#f92672>);</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-
-
-<span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RealFileFinder</span> <span style=color:#66d9ef>implements</span> FileFinder <span style=color:#f92672>{</span>
-  <span style=color:#a6e22e>@Override</span>
-  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
-    File resource <span style=color:#f92672>=</span> Paths<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>path<span style=color:#f92672>).</span><span style=color:#a6e22e>toFile</span><span style=color:#f92672>();</span>
-    <span style=color:#66d9ef>return</span> <span style=color:#f92672>(</span>resource<span style=color:#f92672>.</span><span style=color:#a6e22e>exists</span><span style=color:#f92672>())</span> <span style=color:#f92672>&amp;&amp;</span> resource<span style=color:#f92672>.</span><span style=color:#a6e22e>isDirectory</span><span style=color:#f92672>()</span> <span style=color:#f92672>||</span> resource<span style=color:#f92672>.</span><span style=color:#a6e22e>isFile</span><span style=color:#f92672>();</span>
-  <span style=color:#f92672>}</span>
-<span style=color:#f92672>}</span>
-</code></pre></div><p><code>FileFinderCache</code> in turns takes an instance of <code>FileFinder</code> which is our <strong>real subject</strong>
+it will delegate to the proxy (<code>fileFinderCache</code>).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>FileFinderCache</span> <span style=color:#66d9ef>implements</span> FileFinder <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>final</span> FileFinder fileFinder<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>private</span> Map<span style=color:#f92672>&lt;</span>String<span style=color:#f92672>,</span> Boolean<span style=color:#f92672>&gt;</span> cache <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> HashMap<span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>FileFinderCache</span><span style=color:#f92672>(</span>FileFinder fileFinder<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>this</span><span style=color:#f92672>.</span><span style=color:#a6e22e>fileFinder</span> <span style=color:#f92672>=</span> fileFinder<span style=color:#f92672>;</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    Boolean requestedFiles <span style=color:#f92672>=</span> cache<span style=color:#f92672>.</span><span style=color:#a6e22e>getOrDefault</span><span style=color:#f92672>(</span>path<span style=color:#f92672>,</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>requestedFiles <span style=color:#f92672>==</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>      cache<span style=color:#f92672>.</span><span style=color:#a6e22e>put</span><span style=color:#f92672>(</span>path<span style=color:#f92672>,</span> fileFinder<span style=color:#f92672>.</span><span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>path<span style=color:#f92672>));</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> cache<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>path<span style=color:#f92672>);</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RealFileFinder</span> <span style=color:#66d9ef>implements</span> FileFinder <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>@Override</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>resourceExists</span><span style=color:#f92672>(</span>String path<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    File resource <span style=color:#f92672>=</span> Paths<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>path<span style=color:#f92672>).</span><span style=color:#a6e22e>toFile</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>(</span>resource<span style=color:#f92672>.</span><span style=color:#a6e22e>exists</span><span style=color:#f92672>())</span> <span style=color:#f92672>&amp;&amp;</span> resource<span style=color:#f92672>.</span><span style=color:#a6e22e>isDirectory</span><span style=color:#f92672>()</span> <span style=color:#f92672>||</span> resource<span style=color:#f92672>.</span><span style=color:#a6e22e>isFile</span><span style=color:#f92672>();</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span></code></pre></div><p><code>FileFinderCache</code> in turns takes an instance of <code>FileFinder</code> which is our <strong>real subject</strong>
 (refer to diagram above for reference). The interesting part comes into play is if a
 requested file hasn&rsquo;t been requested before, we&rsquo;ll add the path to our HashMap and ask
 our <code>RealFileFinder</code> to see if the resource exists. This means, on subsequent calls, the answer
@@ -90,6 +89,14 @@ exists? Yes. Do we have to do it every time for that same resource? No. It&rsquo
 result right before potentially creating the resource. This means an immediate
 <code>GET</code> request for that resource could result in a <code>404 Not Found</code>. A workaround might involve
 clearing the cache periodically or bypassing the proxy for <code>POST</code> requests. This something that
-I&rsquo;ll likely have to explore in the future.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-04-03-proxy.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-05-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Composite Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-03-28-package/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Package Principles</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents><ul><li><ul><li><ul><li><a href=#types-of-proxies><strong>Types of Proxies</strong></a></li></ul></li></ul></li></ul></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+I&rsquo;ll likely have to explore in the future.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-04-03-proxy.markdown><i class="fas fa-code-branch"></i>
+Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-04-05-title/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i> Prev</span><br><span>Composite Pattern</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-03-28-package/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Package Principles</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents><ul><li><ul><li><ul><li><a href=#types-of-proxies><strong>Types of Proxies</strong></a></li></ul></li></ul></li></ul></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
 Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
-<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script>
+<script src=/assets/js/popper.min.js></script>
+<script src=/assets/js/bootstrap.min.js></script>
+<script src=/assets/js/navbar.js></script>
+<script src=/assets/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script>
+<script src=/assets/js/single.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

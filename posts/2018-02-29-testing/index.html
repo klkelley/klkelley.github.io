@@ -9,55 +9,61 @@ had it&rsquo;s own implementation of how it chose a move on the board. As long a
 that interface (in Java) or that method was defined within it&rsquo;s class (in Ruby), it didn&rsquo;t
 matter about the implementation as long as they responded to the message.</p><p>In my recent Clojure TTT I had a <code>human</code> player and a <code>computer</code> player; each had their own way
 of choosing a spot on the board. The problem was I didn&rsquo;t have duck typing or interfaces to rely on.
-I ended up with something like this:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure>(<span style=color:#66d9ef>defn </span>next-move
-  [current-player next-player board]
-  (<span style=color:#66d9ef>if </span>(= (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:type</span>) <span style=color:#e6db74>:human</span>)
-    (<span style=color:#a6e22e>get-human-move</span> board)
-    (<span style=color:#a6e22e>get-computer-move</span> board current-player next-player)))
-
-</code></pre></div><p>One of my mentors pointed out that I wasn&rsquo;t adhering to the OCP and they were right. If I were to ever
+I ended up with something like this:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>next-move
+</span></span><span style=display:flex><span>  [current-player next-player board]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>if </span>(= (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:type</span>) <span style=color:#e6db74>:human</span>)
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>get-human-move</span> board)
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>get-computer-move</span> board current-player next-player)))
+</span></span></code></pre></div><p>One of my mentors pointed out that I wasn&rsquo;t adhering to the OCP and they were right. If I were to ever
 introduce other types of players (think different difficulties of an AI player) then I would have to go
 back and re-open my code. But, how do I make this flexible without duck typing or interfaces? In my last
 post, after all, we talked about how design principles can (and should) still be applied in functional
 languages.</p><p>It turns outs, Clojure supports runtime polymorphism through a multimethod system which supports dispatching on types, values, attributes, and metadata of, and relationships between, one or more arguments.</p><p>Defining a multimethod is a combination of a dispatching function, and one or more methods. If you
 read that again it sounds like exactly what we need! But it is still rather confusing. Let&rsquo;s break it down a little.</p><p>We can define a multimethod using <code>defmulti</code> along with a dispatching function. The dispatching function
-is applied the arguments to the multimethod in order to produce a dispatching value. Let&rsquo;s look at an example of this before moving on.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure>(<span style=color:#66d9ef>defmulti </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move 
-  (<span style=color:#66d9ef>fn </span>[current-player next-player board] (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:type</span>)))
-
-</code></pre></div><p>Here we&rsquo;ve defined the first part of our multimethod. We pass in <code>current-player</code> <code>next-player</code> and
+is applied the arguments to the multimethod in order to produce a dispatching value. Let&rsquo;s look at an example of this before moving on.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defmulti </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move 
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>fn </span>[current-player next-player board] (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:type</span>)))
+</span></span></code></pre></div><p>Here we&rsquo;ve defined the first part of our multimethod. We pass in <code>current-player</code> <code>next-player</code> and
 <code>board</code> for two reasons: 1. We need to pass those along as arguments depending on the current player type (refer to the first example) 2. We need to check the type of player (this is our dispatching value) to determine which method is associated with the dispatching value.</p><p>Ok, I hope you&rsquo;re still with me. Now that we have the first part of our multimethod, the <code>move</code>
 function will now try to find the method associated with the dispatching value. In our case the dispatching value will either be <code>:computer</code> or <code>:human</code>. We can achieve this by using <code>defmethod</code> which
-is the other part of the multimethod combination.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure>(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:human</span> 
-  [current-player next-player board] 
-  (<span style=color:#a6e22e>ui/get-human-move</span> (<span style=color:#a6e22e>board/available-spaces</span> board)))
-
-(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:computer</span> 
-  [current-player next-player board] 
-  (<span style=color:#a6e22e>ai/get-computer-move</span> board (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:marker</span>) (<span style=color:#a6e22e>next-player</span> <span style=color:#e6db74>:marker</span>)))
-</code></pre></div><p>So, if the <code>current-player</code> type evaluates to <code>:human</code>, it will call the first function above which
+is the other part of the multimethod combination.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:human</span> 
+</span></span><span style=display:flex><span>  [current-player next-player board] 
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>ui/get-human-move</span> (<span style=color:#a6e22e>board/available-spaces</span> board)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:computer</span> 
+</span></span><span style=display:flex><span>  [current-player next-player board] 
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>ai/get-computer-move</span> board (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:marker</span>) (<span style=color:#a6e22e>next-player</span> <span style=color:#e6db74>:marker</span>)))
+</span></span></code></pre></div><p>So, if the <code>current-player</code> type evaluates to <code>:human</code>, it will call the first function above which
 then calls <code>get-human-move</code>! The same applies if the <code>current-player</code> evaluates to <code>:computer</code>, it will
-call the second function with calls <code>get-computer-move</code>. Ok, this is really cool if you ask me!</p><p>But how does this all tie together, how do we actually use it during game play? Here&rsquo;s everything together:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure>(<span style=color:#66d9ef>defmulti </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move 
-  (<span style=color:#66d9ef>fn </span>[current-player next-player board] (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:type</span>)))
-
-(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:human</span> 
-  [current-player next-player board] 
-  (<span style=color:#a6e22e>ui/get-human-move</span> (<span style=color:#a6e22e>board/available-spaces</span> board)))
-
-(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:computer</span> 
-  [current-player next-player board] 
-  (<span style=color:#a6e22e>ai/get-computer-move</span> board (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:marker</span>) (<span style=color:#a6e22e>next-player</span> <span style=color:#e6db74>:marker</span>)))
-
-<span style=color:#75715e>; ^^ our multimethod </span>
-
-(<span style=color:#66d9ef>defn </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> next-move
-  [current-player next-player board]
-  (<span style=color:#a6e22e>move</span> current-player next-player board))
-
-<span style=color:#75715e>;; ^^ how we use the multimethod</span>
-</code></pre></div><p>As you can see, the last function, <code>next-move</code> utilizes the multimethod which then evalutes
+call the second function with calls <code>get-computer-move</code>. Ok, this is really cool if you ask me!</p><p>But how does this all tie together, how do we actually use it during game play? Here&rsquo;s everything together:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defmulti </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move 
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>fn </span>[current-player next-player board] (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:type</span>)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:human</span> 
+</span></span><span style=display:flex><span>  [current-player next-player board] 
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>ui/get-human-move</span> (<span style=color:#a6e22e>board/available-spaces</span> board)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defmethod </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> move <span style=color:#e6db74>:computer</span> 
+</span></span><span style=display:flex><span>  [current-player next-player board] 
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>ai/get-computer-move</span> board (<span style=color:#a6e22e>current-player</span> <span style=color:#e6db74>:marker</span>) (<span style=color:#a6e22e>next-player</span> <span style=color:#e6db74>:marker</span>)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>; ^^ our multimethod </span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> next-move
+</span></span><span style=display:flex><span>  [current-player next-player board]
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>move</span> current-player next-player board))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>;; ^^ how we use the multimethod</span>
+</span></span></code></pre></div><p>As you can see, the last function, <code>next-move</code> utilizes the multimethod which then evalutes
 the dispatching value (i.e. our current-player) and calls the appropriate function. This means
 that if we add other types of players we can <strong>extend</strong> our code by adding a new <code>defmethod</code> to
 support the new player&rsquo;s move strategy. It adheres to OCP and is polymorphic. It&rsquo;s a win win.
-This is also one of the reasons I&rsquo;ve become keen to Clojure; it&rsquo;s simplistic yet intuitive.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-02-29-testing.markdown><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-03-06-sockets/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>The role of Sockets</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-02-28-functional/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Functional Programming</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+This is also one of the reasons I&rsquo;ve become keen to Clojure; it&rsquo;s simplistic yet intuitive.</p></div><div class=btn-improve-page><a href=https://github.com/klkelley/klkelley.github.io/edit/master/content/posts/2018-02-29-testing.markdown><i class="fas fa-code-branch"></i>
+Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/2018-03-06-sockets/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i> Prev</span><br><span>The role of Sockets</span></a></div><div class="col-md-6 next-article"><a href=/posts/2018-02-28-functional/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Functional Programming</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>kelley.15@gmail.com</span></li></ul></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
 Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
-<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script>
+<script src=/assets/js/popper.min.js></script>
+<script src=/assets/js/bootstrap.min.js></script>
+<script src=/assets/js/navbar.js></script>
+<script src=/assets/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script>
+<script src=/assets/js/single.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>
